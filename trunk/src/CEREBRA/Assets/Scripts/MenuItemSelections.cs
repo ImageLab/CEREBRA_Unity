@@ -1,0 +1,19 @@
+﻿public enum MenuItemSelections 
+{
+	NONE,
+
+	LOAD_FILE,
+	OPEN_RECENT,
+	SAVE_IMAGE,
+	SAVE_MOVIE,
+	EXIT,
+
+	OPTIONS,
+	FILTERS,
+
+	CLEAR_VIEW,
+	VIEW_SIDE_BY_SIDE,
+
+	MANUAL,
+	ABOUT_BRAIN_VIEWER
+}

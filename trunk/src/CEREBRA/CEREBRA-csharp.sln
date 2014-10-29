@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{B051D148-07FA-062A-B1CD-1827AB75BC8E}") = "CEREBRA", "Assembly-CSharp-firstpass-vs.csproj", "{5C551F35-59B6-4088-00C1-A816845BE5AE}"
+EndProject
+Project("{B051D148-07FA-062A-B1CD-1827AB75BC8E}") = "CEREBRA", "Assembly-CSharp-vs.csproj", "{371346E7-F43C-F4EF-84A0-1BD4EEAD97C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C551F35-59B6-4088-00C1-A816845BE5AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C551F35-59B6-4088-00C1-A816845BE5AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C551F35-59B6-4088-00C1-A816845BE5AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C551F35-59B6-4088-00C1-A816845BE5AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{371346E7-F43C-F4EF-84A0-1BD4EEAD97C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{371346E7-F43C-F4EF-84A0-1BD4EEAD97C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{371346E7-F43C-F4EF-84A0-1BD4EEAD97C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{371346E7-F43C-F4EF-84A0-1BD4EEAD97C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+																																																																																																																																																																																																															GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+		Policies = $0
+		$0.TextStylePolicy = $1
+		$1.inheritsSet = null
+		$1.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $2
+		$2.inheritsSet = Mono
+		$2.inheritsScope = text/x-csharp
+		$2.scope = text/x-csharp
+		$0.TextStylePolicy = $3
+		$3.FileWidth = 120
+		$3.TabWidth = 4
+		$3.EolMarker = Unix
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/plain
+		$3.scope = text/plain
+	EndGlobalSection
+
+EndGlobal

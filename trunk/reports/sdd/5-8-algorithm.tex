@@ -1,0 +1,18 @@
+%%% AUTHOR: BAHATTIN, BARIS
+
+\subsection{Algorithm Viewpoint}
+\paragraph{}
+\normalsize
+This section of the Software Design Document focuses on algorithmic aspects of the project. The project aims to minimize on-screen data, i.e. voxels and edges. However, this minimization process must be done delicately, so that only redundant information is purged. When this property is combined with projects big data requirements, even simple processes like sorting and finding $N$ strongest edges become a computational problem.\\
+
+In this version of the Software Design Document, there is no actual algorithm description. They will be added when figured out. Below is the types of minimization algorithms that will be used.\\
+
+\subsubsection{Spatial Minimization Algorithms}
+\paragraph{}
+This kind of algorithms try to minimize number of voxels. Sufficiently near voxels are combined. However, this type of algorithms change size of voxels, requiring a more complicated drawing method.\\
+
+\subsubsection{Functional Minimization Algorithms}
+\paragraph{}
+This kind of algorithms try to minimize number of edges drawn. 80000 voxels are not really much of a job given current capacity of graphics cards. However, routing and drawing 6.4 billion edges is computationally exhaustive. It also makes the output hard to understand. Because of these, this type of algorithms are essential to the project.
+    
+\skipsubsection
