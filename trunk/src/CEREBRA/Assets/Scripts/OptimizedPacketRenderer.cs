@@ -19,8 +19,12 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 	void generateVoxelGeometry(float size=1f, bool resizeByIntensity = false) 
 	{
-		if (packetToRender != null)
+
+		if ( packetToRender != null)
 		{
+
+            if (packetToRender.hideVoxels == true) return;
+
 			int lenVoxels=packetToRender.vXYZ.Length;
 
 			if (lenVoxels > 8000)
@@ -132,7 +136,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			m.Clear();
 
-			m.vertices = vertices;
+            if( !packetToRender.hideVoxels)
+			    m.vertices = vertices;
 			m.uv = uvs;
 			m.triangles = tris;
 			m.RecalculateNormals();
@@ -214,14 +219,13 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
         voxelMin = (float)packetToRender.Intensities[0, 0];
         voxelMax = (float)packetToRender.Intensities[0, 0];
+
         for (int o = 0; o < packetToRender.vXYZ.Length; o++)
         {
             if ((float)packetToRender.Intensities[0, o] < voxelMin) voxelMin = (float)packetToRender.Intensities[0, o];
             if ((float)packetToRender.Intensities[0, o] > voxelMax) voxelMax = (float)packetToRender.Intensities[0, o];
         }
         
-        
-
 		generateVoxelGeometry(0.4f,true);
 
 		List<Vector3> voxelPositions = new List<Vector3>();
@@ -400,7 +404,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
         if (Input.GetKeyDown("c"))
         {
 
-            Application.CaptureScreenshot("fff.png");
+            Application.CaptureScreenshot( ScreenShotName( camera.targetTexture.width, camera.targetTexture.height));
             RenderTexture rt = new RenderTexture(camera.targetTexture.width, camera.targetTexture.height, 24);
             camera.targetTexture = rt;
             Texture2D screenShot = new Texture2D(camera.targetTexture.width, camera.targetTexture.height, TextureFormat.RGB24, false);
@@ -430,6 +434,5 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 		}
 
 		camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, zoom, Time.deltaTime * smooth);
-
 	}
 }

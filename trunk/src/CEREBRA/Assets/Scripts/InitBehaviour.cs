@@ -347,7 +347,7 @@ public class InitBehaviour : MonoBehaviour
     }
     void saveButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
-        Application.CaptureScreenshot("Screenshot.png");
+        //Application.CaptureScreenshot("Screenshot.png");
     }
 
     //decide the rank vaues for each voxel.

@@ -16,6 +16,7 @@ public class PacketRenderer : MonoBehaviour
 	void Start()
 	{
 		List<Vector3> voxelPositions = new List<Vector3>();
+
 		for (int i = 0; i < packetToRender.vXYZ.Length; i++ )
 		{
 			GameObject voxelObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -25,6 +26,7 @@ public class PacketRenderer : MonoBehaviour
 			voxelObject.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
 			voxelObject.isStatic = true;
 		}
+
 		UnityEngine.Debug.Log(packetToRender.vXYZ.Length);
 		UnityEngine.Debug.Log(packetToRender.Edges.GetLength(1));
 
@@ -94,6 +96,5 @@ public class PacketRenderer : MonoBehaviour
 		}
 
 		camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, zoom, Time.deltaTime * smooth);
-
 	}
 }

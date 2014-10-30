@@ -89,6 +89,8 @@ namespace libsimple
 
 		private Dictionary<string, object> extras;
 
+        public bool hideVoxels;
+
 		/// <summary>
 		/// Lets you define an extra data for this Packet object. For example, input file
 		/// name can be passed this way.
@@ -147,6 +149,7 @@ namespace libsimple
             EdgeMapZ = null;
 			vXYZ = null;
 			extras = new Dictionary<string, object>();
+            hideVoxels = false;
 		}
 
 		/// <summary>
@@ -162,6 +165,7 @@ namespace libsimple
 			p.extras = new Dictionary<string, object>(extras);
 
             // Copy intensities
+
             if (Intensities != null)
 			{
 				int l0 = Intensities.GetLength(0);
@@ -261,6 +265,8 @@ namespace libsimple
                     p.MNITransitionMatrix[i, 3] = MNITransitionMatrix[i, 3];
                 }
             }
+
+            p.hideVoxels = hideVoxels;
 
 			return p;
 		}

@@ -57,7 +57,9 @@ namespace ProcessorUnit
         {
             Packet newPacket = p.Copy();
             /* packet'a yeni field eklenecek (bool hideVoxels) ve bu field burda set edilecek. Render edilirken bu değere bakıp voxeller cizilecek*/
-        
+
+            newPacket.hideVoxels = true;
+
             return newPacket;
         }
     }
