@@ -345,9 +345,18 @@ public class InitBehaviour : MonoBehaviour
         fileBrowser.onFileSelect += fileBrowser_onFileSelect;
         CEREBRAUI.Add(fileBrowser);
     }
+
+    public static string ScreenShotName(int width, int height)
+    {
+        return string.Format("{0}/screenshots/screen_{1}x{2}_{3}.png",
+                             Application.dataPath,
+                             width, height,
+                             System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+    }
+
     void saveButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
-        //Application.CaptureScreenshot("Screenshot.png");
+        Application.CaptureScreenshot( ScreenShotName( 1024, 768));
     }
 
     //decide the rank vaues for each voxel.
