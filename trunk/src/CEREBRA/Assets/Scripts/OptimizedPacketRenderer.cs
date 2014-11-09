@@ -404,7 +404,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
         if (Input.GetKeyDown("c"))
         {
 
-            Application.CaptureScreenshot( ScreenShotName( 1024, 768);
+            Application.CaptureScreenshot( "askdlas");
             RenderTexture rt = new RenderTexture(camera.targetTexture.width, camera.targetTexture.height, 24);
             camera.targetTexture = rt;
             Texture2D screenShot = new Texture2D(camera.targetTexture.width, camera.targetTexture.height, TextureFormat.RGB24, false);

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PotatoPrint.cs" />
     <Compile Include="ShowVoxelsAboveAnIntensityValue.cs" />
     <Compile Include="ConvertToMNI.cs" />
     <Compile Include="EdgesMoreThanAverageIntensity.cs" />
