@@ -36,8 +36,8 @@ namespace ProcessorUnit
         {
             arguments = new string[2, 2];
 
-            arguments[0, 0] = "Esen: ";// arguments[0, 1] = "degrees around x.";//
-            arguments[1, 0] = "Irmak: ";// arguments[1, 1] = "degrees around y.";//
+            arguments[0, 0] = "Slice Axis: ";// arguments[0, 1] = "degrees around x.";//
+            arguments[1, 0] = "Slice Number: ";// arguments[1, 1] = "degrees around y.";//
 
             return arguments;
         }
@@ -53,9 +53,9 @@ namespace ProcessorUnit
             int[] ranks = new int[p.vXYZ.Length];
             int[] ranksY = new int[p.vXYZ.Length];
             int[] ranksZ = new int[p.vXYZ.Length];
-            float minX, maxX, avgX;
-            float minY, maxY, avgY;
-            float minZ, maxZ, avgZ;
+            float minX, maxX;
+            float minY, maxY;
+            float minZ, maxZ;
             minX = p.vXYZ[0].x;
             maxX = p.vXYZ[0].x;
             minY = p.vXYZ[0].y;
@@ -102,7 +102,7 @@ namespace ProcessorUnit
                 for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
                 {
 
-                    if (ranks[i] <= sliceNumber)
+                    if (ranks[i] == sliceNumber)
                     {
 
                         tmp.Add(newPacket.vXYZ[i]);
@@ -125,9 +125,9 @@ namespace ProcessorUnit
                     {
                         for (int j = 0, k = 0; j < p.Edges.GetLength(1); j++)
                         {
-                            if (ranks[j] > sliceNumber) continue;
+                            if (ranks[j] > sliceNumber || ranks[j]<sliceNumber) continue;
                             List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(p.Edges[i, j]);
-                            tempEdges.RemoveAll(x => (ranks[x.Key] > sliceNumber));
+                            tempEdges.RemoveAll(x => (ranks[x.Key] > sliceNumber || ranks[x.Key] < sliceNumber));
 
                             for (int l = 0; l < tempEdges.Count; l++)
                             {
@@ -142,12 +142,100 @@ namespace ProcessorUnit
                 }
             }
             else if (sliceAxis == "Y")
-            { 
-            
+            {
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+
+                    if (ranksY[i] == sliceNumber)
+                    {
+
+                        tmp.Add(newPacket.vXYZ[i]);
+                        keyMap[i] = j;
+                        j++;
+                    }
+                    else
+                    {
+                        keyMap[i] = -1;
+                    }
+                }
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+
+                if (p.Edges != null)
+                {
+
+                    newPacket.Edges = new KeyValuePair<int, double>[newPacket.Edges.GetLength(0), tmp.Count][];
+                    for (int i = 0; i < newPacket.Edges.GetLength(0); i++)
+                    {
+                        for (int j = 0, k = 0; j < p.Edges.GetLength(1); j++)
+                        {
+                            if (ranksY[j] > sliceNumber || ranksY[j] < sliceNumber) continue;
+                            List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(p.Edges[i, j]);
+                            tempEdges.RemoveAll(y => (ranksY[y.Key] > sliceNumber || ranksY[y.Key] < sliceNumber));
+
+                            for (int l = 0; l < tempEdges.Count; l++)
+                            {
+                                tempEdges[l] = new KeyValuePair<int, double>(keyMap[tempEdges[l].Key], tempEdges[l].Value);
+                            }
+
+                            newPacket.Edges[i, k] = new KeyValuePair<int, double>[tempEdges.Count];
+                            newPacket.Edges[i, k] = tempEdges.ToArray();
+                            k++;
+                        }
+                    }
+                }
             }
             else if (sliceAxis == "Z")
-            { 
-            
+            {
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+
+                    if (ranksZ[i] == sliceNumber)
+                    {
+
+                        tmp.Add(newPacket.vXYZ[i]);
+                        keyMap[i] = j;
+                        j++;
+                    }
+                    else
+                    {
+                        keyMap[i] = -1;
+                    }
+                }
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+
+                if (p.Edges != null)
+                {
+
+                    newPacket.Edges = new KeyValuePair<int, double>[newPacket.Edges.GetLength(0), tmp.Count][];
+                    for (int i = 0; i < newPacket.Edges.GetLength(0); i++)
+                    {
+                        for (int j = 0, k = 0; j < p.Edges.GetLength(1); j++)
+                        {
+                            if (ranksZ[j] > sliceNumber || ranksZ[j] < sliceNumber) continue;
+                            List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(p.Edges[i, j]);
+                            tempEdges.RemoveAll(z => (ranksZ[z.Key] > sliceNumber || ranksZ[z.Key] < sliceNumber));
+
+                            for (int l = 0; l < tempEdges.Count; l++)
+                            {
+                                tempEdges[l] = new KeyValuePair<int, double>(keyMap[tempEdges[l].Key], tempEdges[l].Value);
+                            }
+
+                            newPacket.Edges[i, k] = new KeyValuePair<int, double>[tempEdges.Count];
+                            newPacket.Edges[i, k] = tempEdges.ToArray();
+                            k++;
+                        }
+                    }
+                }
             }
             return newPacket;
         }
