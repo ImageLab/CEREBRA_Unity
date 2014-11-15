@@ -70,7 +70,64 @@ namespace ProcessorUnit
         Packet IProcessor.Process(Packet p)
         {
 
-            return new Packet();
-        }
+            {
+                libsimple.Packet newPacket = p.Copy();
+
+                int[] ranks = new int[p.vXYZ.Length];
+                int[] ranksY = new int[p.vXYZ.Length];
+                int[] ranksZ = new int[p.vXYZ.Length];
+
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+
+                    if (p.Intensities[0, i] >= percentage)
+                    {
+
+                        tmp.Add(newPacket.vXYZ[i]);
+                        keyMap[i] = j;
+                        j++;
+                    }
+                    else
+                    {
+                        keyMap[i] = -1;
+                    }
+                }
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                if (p.Edges != null)
+                {
+
+                    newPacket.Edges = new KeyValuePair<int, double>[newPacket.Edges.GetLength(0), tmp.Count][];
+                    for (int i = 0; i < newPacket.Edges.GetLength(0); i++)
+                    {
+                        for (int j = 0, k = 0; j < p.Edges.GetLength(1); j++)
+                        {
+                            if (p.Intensities[0, j] < percentage) continue;
+                            List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(p.Edges[i, j]);
+                            tempEdges.RemoveAll(x => (p.Intensities[0, x.Key] < percentage));
+
+                            for (int l = 0; l < tempEdges.Count; l++)
+                            {
+                                tempEdges[l] = new KeyValuePair<int, double>(keyMap[tempEdges[l].Key], tempEdges[l].Value);
+                            }
+
+                            newPacket.Edges[i, k] = new KeyValuePair<int, double>[tempEdges.Count];
+                            newPacket.Edges[i, k] = tempEdges.ToArray();
+                            k++;
+                        }
+                    }
+                }
+
+
+                return newPacket;
+
+            }
+
+        }   
+     
     }
 }
