@@ -16,7 +16,10 @@ public class InitBehaviour : MonoBehaviour
     SimpleUI.UISlider layerSlider;
     SimpleUI.UISlider layerSlidery;
     SimpleUI.UISlider layerSliderz;
-    libsimple.Packet packet;
+    libsimple.Packet lastLoadedPacket;
+    libsimple.Packet packetToDisplay;
+    libsimple.Packet nextPacket;
+    int percent;
     float layerValueX ;
     float layerValueY ;
     float layerValueZ ;
@@ -76,6 +79,7 @@ public class InitBehaviour : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        percent = 1;
         loadDirectory("processors");
         CSVLoader c = new CSVLoader();
         libsimple.ProcessorManager.Register(c);
@@ -422,7 +426,7 @@ public class InitBehaviour : MonoBehaviour
 
     libsimple.Packet processLayers(int layer)
     {
-        if (packet == null)
+        if (lastLoadedPacket == null)
             return null;
         else
         {
@@ -430,11 +434,11 @@ public class InitBehaviour : MonoBehaviour
             int layerValX = layerSlider.maxValue - (int)layerValueX;
             int layerValY = layerSlidery.maxValue - (int)layerValueY;
             int layerValZ = layerSliderz.maxValue - (int)layerValueZ;
-            int[] ranks = (int[])packet.getExtra("layerRanks");
-            int[] ranksY = (int[])packet.getExtra("layerRanksY");
-            int[] ranksZ = (int[])packet.getExtra("layerRanksZ");
+            int[] ranks = (int[])lastLoadedPacket.getExtra("layerRanks");
+            int[] ranksY = (int[])lastLoadedPacket.getExtra("layerRanksY");
+            int[] ranksZ = (int[])lastLoadedPacket.getExtra("layerRanksZ");
 
-            libsimple.Packet newPacket = packet.Copy();
+            libsimple.Packet newPacket = lastLoadedPacket.Copy();
             
             int[] keyMap = new int[newPacket.vXYZ.Length];
 
@@ -458,16 +462,16 @@ public class InitBehaviour : MonoBehaviour
             newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
             for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
 
-            if (packet.Edges != null)
+            if (lastLoadedPacket.Edges != null)
             {
                 
                 newPacket.Edges = new KeyValuePair<int, double>[newPacket.Edges.GetLength(0), tmp.Count][];
                 for (int i = 0; i < newPacket.Edges.GetLength(0); i++)
                 {
-                    for (int j = 0, k = 0; j < packet.Edges.GetLength(1); j++)
+                    for (int j = 0, k = 0; j < lastLoadedPacket.Edges.GetLength(1); j++)
                     {
                         if (ranks[j] > layerValX || ranksY[j] > layerValY || ranksZ[j] > layerValZ) continue;
-                        List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(packet.Edges[i, j]);
+                        List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(lastLoadedPacket.Edges[i, j]);
                         tempEdges.RemoveAll(x => (ranks[x.Key] > layerValX));
                         tempEdges.RemoveAll(y => (ranksY[y.Key] > layerValY));
                         tempEdges.RemoveAll(z => (ranksZ[z.Key] > layerValZ));
@@ -553,8 +557,8 @@ public class InitBehaviour : MonoBehaviour
             pp.AddProcessor(proc.ToArray());
         }
 
-        packet = pp.Run();
-        registerLayers_onLoad(packet);
+        lastLoadedPacket = pp.Run();
+        registerLayers_onLoad(lastLoadedPacket);
         renderPacket(processLayers(layerSlider.hSliderValue));
 
         System.IO.Directory.SetCurrentDirectory(currDir);
@@ -575,6 +579,16 @@ public class InitBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if( percent == 1000)
+        //    percent = 1;
 
+        //packetToDisplay = lastLoadedPacket.Copy();
+
+        //for (int i = 0; i < packetToDisplay.Intensities.Length; i++)
+        //    packetToDisplay.Intensities[0, i] += (percent * packetToDisplay.Intensities[0, i]) / 1000;
+
+        //percent++;
+
+        //renderPacket(packetToDisplay);
     }
 }

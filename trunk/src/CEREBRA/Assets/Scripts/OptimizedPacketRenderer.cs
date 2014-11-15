@@ -30,11 +30,14 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 			if (lenVoxels > 8000)
 				lenVoxels = 8000;
 
-			int numVertices = lenVoxels * 8;
+            int numVertices = 0;
+
+            if( !packetToRender.hideVoxels)
+                numVertices = lenVoxels * 8;
 			int numTris = lenVoxels * 36;
 
 			Vector3[] vertices = new Vector3[numVertices];
-			Vector2[] uvs = new Vector2[numVertices]; // texture indexes
+            Vector2[] uvs = new Vector2[lenVoxels * 8]; // texture indexes
 			int[] tris = new int[numTris];
 
 			int i = 0;
@@ -64,11 +67,14 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 					if (lenVoxels > 8000)
 						lenVoxels = 8000;
 
-					numVertices = lenVoxels * 8;
+                    if (packetToRender.hideVoxels)
+                        numVertices = 0;
+                    else
+					    numVertices = lenVoxels * 8;
 					numTris = lenVoxels * 36;
 
 					vertices = new Vector3[numVertices];
-					uvs = new Vector2[numVertices]; // texture indexes
+                    uvs = new Vector2[lenVoxels * 8]; // texture indexes
 					tris = new int[numTris];
 
 					i = 0;
@@ -83,19 +89,21 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 // \DENEME
 				//ORIGINAL : 
                 //float spread = resizeByIntensity ? size * 0.5f * Mathf.Clamp01((float)packetToRender.Intensities[0, j]) : size * 0.5f;
-
                 
 				//UnityEngine.Debug.Log("x: " + packetToRender.vXYZ[j].x + ", y: " + packetToRender.vXYZ[j].y + ", z: " + packetToRender.vXYZ[j].z);
 
 				// push vertices
-				vertices[i * 8 + 0] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
-				vertices[i * 8 + 1] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
-				vertices[i * 8 + 2] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
-				vertices[i * 8 + 3] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
-				vertices[i * 8 + 4] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
-				vertices[i * 8 + 5] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
-				vertices[i * 8 + 6] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
-				vertices[i * 8 + 7] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
+                if (!packetToRender.hideVoxels){
+
+                    vertices[i * 8 + 0] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 1] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 2] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 3] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 4] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 5] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 6] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 7] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
+                }
 
 				// push texture coordinates
 				uvs[i * 8 + 0] = new Vector2(0.5f, Mathf.Clamp01((float)packetToRender.Intensities[0, i]));
@@ -136,8 +144,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			m.Clear();
 
-            if( !packetToRender.hideVoxels)
-			    m.vertices = vertices;
+            //if( !packetToRender.hideVoxels)
+			m.vertices = vertices;
 			m.uv = uvs;
 			m.triangles = tris;
 			m.RecalculateNormals();
