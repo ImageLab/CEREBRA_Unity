@@ -81,13 +81,13 @@
      <Compile Include="Assets\SimpleUI\UITextbox.cs" />
      <Compile Include="Assets\SimpleUI\UIWindow.cs" />
  <Reference Include="Assembly-UnityScript-firstpass">
- <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ <HintPath>C:/Users/Can/Google Drive/Developer/Unity/CEREBRA/trunk/src/CEREBRA/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
  </Reference>
  <Reference Include="ConvexHullProcessor">
- <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/ConvexHullProcessor.dll</HintPath>
+ <HintPath>C:/Users/Can/Google Drive/Developer/Unity/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/ConvexHullProcessor.dll</HintPath>
  </Reference>
  <Reference Include="libsimple">
- <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>
+ <HintPath>C:/Users/Can/Google Drive/Developer/Unity/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
