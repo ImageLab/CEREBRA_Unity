@@ -89,6 +89,7 @@ namespace ProcessorUnit
                     newPacket.Intensities[i, j] = newPacket.Intensities[i, j] * (endOfTtheRange - startOfTtheRange) + startOfTtheRange; // min - max araligi. User belirleyecek.
                 }
             }
+
             return newPacket;
         }
     }

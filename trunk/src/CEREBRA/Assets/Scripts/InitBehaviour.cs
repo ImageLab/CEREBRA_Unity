@@ -575,20 +575,4 @@ public class InitBehaviour : MonoBehaviour
         renderer.packetToRender = p;
         renderer.ScaleTexture = ScaleTexture;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        //if( percent == 1000)
-        //    percent = 1;
-
-        //packetToDisplay = lastLoadedPacket.Copy();
-
-        //for (int i = 0; i < packetToDisplay.Intensities.Length; i++)
-        //    packetToDisplay.Intensities[0, i] += (percent * packetToDisplay.Intensities[0, i]) / 1000;
-
-        //percent++;
-
-        //renderPacket(packetToDisplay);
-    }
 }

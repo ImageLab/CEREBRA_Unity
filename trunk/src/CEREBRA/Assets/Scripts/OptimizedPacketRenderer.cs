@@ -82,7 +82,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 //DENEME
                
                 float temp = size * 0.5f * Mathf.Clamp01((float)packetToRender.Intensities[0, j]);
-                float newsize =userMax - ( (0.5f * (voxelMax - temp)) / (voxelMax - voxelMin) );
+                float newsize = userMax - ( (0.5f * (voxelMax - temp)) / (voxelMax - voxelMin) );
                 float spread = resizeByIntensity ? newsize : size * 0.5f;
                 //float spread = size * 0.5f;
                 
@@ -384,6 +384,9 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                              System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
     }
 
+    float timeLeft = 0;
+    Color targetColor = new Color(Random.value, Random.value, Random.value);
+
 	// Update is called once per frame
 	void Update()
 	{
@@ -412,7 +415,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
         if (Input.GetKeyDown("c"))
         {
 
-            Application.CaptureScreenshot( "askdlas");
+            Application.CaptureScreenshot( ScreenShotName(camera.targetTexture.width, camera.targetTexture.height));
             RenderTexture rt = new RenderTexture(camera.targetTexture.width, camera.targetTexture.height, 24);
             camera.targetTexture = rt;
             Texture2D screenShot = new Texture2D(camera.targetTexture.width, camera.targetTexture.height, TextureFormat.RGB24, false);
@@ -424,7 +427,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
             Destroy(rt);
             byte[] bytes = screenShot.EncodeToPNG();
             string filename = ScreenShotName(camera.targetTexture.width, camera.targetTexture.height);
-            System.IO.File.WriteAllBytes(filename, bytes);
+            //System.IO.File.WriteAllBytes(filename, bytes);
             Debug.Log(string.Format("Took screenshot to: {0}", filename)); ;
         }
 
@@ -442,5 +445,34 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 		}
 
 		camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, zoom, Time.deltaTime * smooth);
+
+        //GameObject go = GameObject.Find("VoxelNode_final");
+        //Mesh m = go.GetComponent<MeshFilter>().mesh;
+
+        if (timeLeft <= Time.deltaTime)
+        {
+            // transition complete
+            // assign the target color
+            //for (int i = 0; i < m.uv.Length; i++)
+              //  m.uv[i] = new Vector2(0.5f, Random.value);
+
+            camera.backgroundColor = targetColor;
+
+            // start a new transition
+            targetColor = new Color(Random.value, Random.value, Random.value);
+            timeLeft = 1.0f;
+            //camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime / timeLeft);
+        }
+        else
+        {
+            // transition in progress
+            // calculate interpolated color
+            //for (int i = 0; i < m.uv.Length; i++)
+              //  m.uv[i] = new Vector2(0.5f, Mathf.Lerp(m.uv[i].y, Random.value, 10*Time.deltaTime / timeLeft));
+            camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime / timeLeft);
+
+            // update the timer
+            timeLeft -= Time.deltaTime/10;
+        }
 	}
 }
