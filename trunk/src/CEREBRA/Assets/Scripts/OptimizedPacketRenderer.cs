@@ -5,9 +5,10 @@ using System.Collections.Generic;
 public class OptimizedPacketRenderer : MonoBehaviour {
 	int zoom = 60;
 	float smooth = 5;
-
+    int voxelBufSize = 1800; //65536 -> max suggested vertex count in a mesh. 65536/36 =~ 1800 num of voxels in a mesh
 	public float moveSpeed = 10f;
 	public Texture ScaleTexture;
+    Mesh[] meshes;
 	//private float speed = 1.0f;
     public libsimple.Packet packetToRender;
 
@@ -16,10 +17,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     float voxelMin;
     float voxelMax;
 	
-
 	void generateVoxelGeometry(float size=1f, bool resizeByIntensity = false) 
 	{
-
 		if ( packetToRender != null)
 		{
 
@@ -27,8 +26,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			int lenVoxels=packetToRender.vXYZ.Length;
 
-			if (lenVoxels > 8000)
-				lenVoxels = 8000;
+            if (lenVoxels > voxelBufSize)
+                lenVoxels = voxelBufSize;
 
             int numVertices = 0;
 
@@ -44,12 +43,17 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			int numVoxels=packetToRender.vXYZ.Length;
 
+            meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
+
 			for (int j = 0; j < numVoxels; j++, i++)
 			{
-				if (i >= 8000) {
-					GameObject g = new GameObject("VoxelNode_"+(j/8000).ToString());
+                if (i >= voxelBufSize)
+                {
+                    GameObject g = new GameObject("VoxelNode_" + (j / voxelBufSize).ToString());
 					g.transform.parent = GameObject.Find("TargetGameObject").transform;
-					Mesh me = g.AddComponent<MeshFilter>().mesh;
+                    meshes[(j / voxelBufSize) - 1] = g.AddComponent<MeshFilter>().mesh;
+
+                    Mesh me = meshes[(j / voxelBufSize) - 1];
 					g.AddComponent<MeshRenderer>();
 					g.renderer.material.mainTexture = ScaleTexture;
 
@@ -64,8 +68,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 					me.Optimize();
 
 					lenVoxels=numVoxels-j;
-					if (lenVoxels > 8000)
-						lenVoxels = 8000;
+                    if (lenVoxels > voxelBufSize)
+                        lenVoxels = voxelBufSize;
 
                     if (packetToRender.hideVoxels)
                         numVertices = 0;
@@ -376,10 +380,9 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 		m.Optimize();
 	}
 
-    public static string ScreenShotName(int width, int height)
+    public string ScreenShotName(int width, int height)
     {
-        return string.Format("{0}/screenshots/screen_{1}x{2}_{3}.png",
-                             Application.dataPath,
+        return string.Format("screen_{1}x{2}_{3}.png",
                              width, height,
                              System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
     }
@@ -414,21 +417,17 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
         if (Input.GetKeyDown("c"))
         {
+            //Application.CaptureScreenshot( "screenshot");
 
-            Application.CaptureScreenshot( ScreenShotName(camera.targetTexture.width, camera.targetTexture.height));
-            RenderTexture rt = new RenderTexture(camera.targetTexture.width, camera.targetTexture.height, 24);
-            camera.targetTexture = rt;
-            Texture2D screenShot = new Texture2D(camera.targetTexture.width, camera.targetTexture.height, TextureFormat.RGB24, false);
-            camera.Render();
-            RenderTexture.active = rt;
-            screenShot.ReadPixels(new Rect(0, 0, camera.targetTexture.width, camera.targetTexture.height), 0, 0);
-            camera.targetTexture = null;
-            RenderTexture.active = null; // JC: added to avoid errors
-            Destroy(rt);
+            Texture2D screenShot = new Texture2D(ScaleTexture.width, ScaleTexture.height, TextureFormat.RGB24, false);
+            //ScaleT.Render();
+            //RenderTexture.active = ScaleTexture;
+            screenShot.ReadPixels(new Rect(0, 0, ScaleTexture.width, ScaleTexture.height), 0, 0);
+            //RenderTexture.active = null; // JC: added to avoid errors
             byte[] bytes = screenShot.EncodeToPNG();
-            string filename = ScreenShotName(camera.targetTexture.width, camera.targetTexture.height);
-            //System.IO.File.WriteAllBytes(filename, bytes);
-            Debug.Log(string.Format("Took screenshot to: {0}", filename)); ;
+            string filename = string.Format( "screenshot_{0}.png", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
+            System.IO.File.WriteAllBytes(filename, bytes);
+            Debug.Log(string.Format("Took screenshot to: {0}", filename));
         }
 
 		if (Input.GetAxis("Mouse ScrollWheel") < 0) // forward
@@ -444,10 +443,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 				zoom = 0;
 		}
 
-		camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, zoom, Time.deltaTime * smooth);
-
-        //GameObject go = GameObject.Find("VoxelNode_final");
-        //Mesh m = go.GetComponent<MeshFilter>().mesh;
+        camera.fieldOfView = Mathf.Lerp(camera.fieldOfView, zoom, Time.deltaTime * smooth);
 
         if (timeLeft <= Time.deltaTime)
         {
@@ -469,10 +465,10 @@ public class OptimizedPacketRenderer : MonoBehaviour {
             // calculate interpolated color
             //for (int i = 0; i < m.uv.Length; i++)
               //  m.uv[i] = new Vector2(0.5f, Mathf.Lerp(m.uv[i].y, Random.value, 10*Time.deltaTime / timeLeft));
-            camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime / timeLeft);
+            camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime/(timeLeft*smooth));
 
             // update the timer
-            timeLeft -= Time.deltaTime/10;
+            timeLeft -= Time.deltaTime/smooth;
         }
 	}
 }
