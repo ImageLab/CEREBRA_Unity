@@ -539,11 +539,13 @@ public class InitBehaviour : MonoBehaviour
 
         libsimple.Pipeline pp = new libsimple.Pipeline();
         pp.AddProcessor(new string[] { opener, filename });
-
+        int index=-1;
         for (int i = 0; i < processors.Count; i++)
         {
             List<string> proc = new List<string>();
             proc.Add(processors[i].GetProcessorName());
+            if(processors[i].GetProcessorName()=="Potato Print")
+                    index=i;
             proc.AddRange(processorConfigs[i]);
 
             pp.AddProcessor(proc.ToArray());
@@ -552,6 +554,8 @@ public class InitBehaviour : MonoBehaviour
         lastLoadedPacket = pp.Run();
         registerLayers_onLoad(lastLoadedPacket);
         renderPacket(processLayers(layerSlider.hSliderValue));
+        if (index != -1) { 
+        }
 
         System.IO.Directory.SetCurrentDirectory(currDir);
     }

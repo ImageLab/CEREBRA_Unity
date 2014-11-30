@@ -1,0 +1,1 @@
+Assets/GUI Components/newGUI/customSkin_0002s_0001s_0010_chkboxOn.bmp

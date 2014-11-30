@@ -237,6 +237,7 @@ namespace ProcessorUnit
                     }
                 }
             }
+            newPacket.potatoProcess = true;
             return newPacket;
         }
     }
