@@ -23,6 +23,8 @@ public class InitBehaviour : MonoBehaviour
     float layerValueX ;
     float layerValueY ;
     float layerValueZ ;
+    // public delegate void ProcessorConfiguredHandler(libsimple.IProcessor proc, string[] args);
+    // public event ProcessorConfiguredHandler onProcessorConfigured;
 
     void loadFile(string filename)
     {
@@ -97,6 +99,7 @@ public class InitBehaviour : MonoBehaviour
         SimpleUI.UIButton loadButton = new SimpleUI.UIButton("Load Data");
         SimpleUI.UIButton reloadButton = new SimpleUI.UIButton("Reload");
         SimpleUI.UIButton saveButton = new SimpleUI.UIButton("Save");
+        SimpleUI.UIButton mniButton = new SimpleUI.UIButton("MNI Conversion");
 
         processorListElem = new SimpleUI.UIList(new Vector2(0.01f, 0.05f), new Vector2(0.18f, 0.4f));
         processorListElem.Data = new System.Collections.Generic.List<string>();
@@ -173,6 +176,12 @@ public class InitBehaviour : MonoBehaviour
         reloadButton.Position = new Vector2(0.875f, 0.95f);
         reloadButton.onClick += reloadButton_onClick;
 
+
+        mniButton.Size = new Vector2(0.085f, 0.025f);
+        mniButton.Position = new Vector2(0.9f, 0.85f);
+        mniButton.onClick += mniButton_onClick;
+
+
         saveButton.Size = new Vector2(0.05f, 0.025f);
 		saveButton.Position = new Vector2(0.815f, 0.85f);
         saveButton.onClick += saveButton_onClick;
@@ -185,6 +194,7 @@ public class InitBehaviour : MonoBehaviour
         CEREBRAUI.Add(configPanel);
 		CEREBRAUI.Add(processorListLabel);
         CEREBRAUI.Add(loadButton);
+        CEREBRAUI.Add(mniButton);
         CEREBRAUI.Add(saveButton);
         CEREBRAUI.Add(layerSlider);
         CEREBRAUI.Add(layerSlidery);
@@ -253,6 +263,7 @@ public class InitBehaviour : MonoBehaviour
         fileBrowser_onFileSelect(null, lastLoadedData);
     }
 
+
     void downButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
         int selected = processorListElem.SelectedIndex;
@@ -308,6 +319,23 @@ public class InitBehaviour : MonoBehaviour
             processorListElem.Data.RemoveAt(selected);
         }
     }
+
+
+
+    //promote to select MNI trans. matrix, and then apply the conversion
+    void mniButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
+    {
+
+        SimpleUI.UIProcessorLister lister = new SimpleUI.UIProcessorLister(new string[]  {"MNI Converter"}, new Vector2(0.5f, 0.5f));
+        lister.onProcessorCreate += lister_onProcessorCreate;
+
+        CEREBRAUI.Add(lister);
+        //libsimple.IProcessor proc = libsimple.ProcessorManager.GetProcessorInstance("MNI Converte");
+
+
+    }
+
+
 
     void addButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
