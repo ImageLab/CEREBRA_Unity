@@ -23,8 +23,6 @@ public class InitBehaviour : MonoBehaviour
     float layerValueX ;
     float layerValueY ;
     float layerValueZ ;
-    // public delegate void ProcessorConfiguredHandler(libsimple.IProcessor proc, string[] args);
-    // public event ProcessorConfiguredHandler onProcessorConfigured;
 
     void loadFile(string filename)
     {
@@ -263,7 +261,6 @@ public class InitBehaviour : MonoBehaviour
         fileBrowser_onFileSelect(null, lastLoadedData);
     }
 
-
     void downButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
         int selected = processorListElem.SelectedIndex;
@@ -330,7 +327,7 @@ public class InitBehaviour : MonoBehaviour
         lister.onProcessorCreate += lister_onProcessorCreate;
 
         CEREBRAUI.Add(lister);
-        //libsimple.IProcessor proc = libsimple.ProcessorManager.GetProcessorInstance("MNI Converte");
+        
 
 
     }
@@ -567,11 +564,13 @@ public class InitBehaviour : MonoBehaviour
 
         libsimple.Pipeline pp = new libsimple.Pipeline();
         pp.AddProcessor(new string[] { opener, filename });
-
+        int index=-1;
         for (int i = 0; i < processors.Count; i++)
         {
             List<string> proc = new List<string>();
             proc.Add(processors[i].GetProcessorName());
+            if(processors[i].GetProcessorName()=="Potato Print")
+                    index=i;
             proc.AddRange(processorConfigs[i]);
 
             pp.AddProcessor(proc.ToArray());
@@ -580,6 +579,8 @@ public class InitBehaviour : MonoBehaviour
         lastLoadedPacket = pp.Run();
         registerLayers_onLoad(lastLoadedPacket);
         renderPacket(processLayers(layerSlider.hSliderValue));
+        if (index != -1) { 
+        }
 
         System.IO.Directory.SetCurrentDirectory(currDir);
     }

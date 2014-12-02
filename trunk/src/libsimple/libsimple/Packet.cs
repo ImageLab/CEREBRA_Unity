@@ -32,6 +32,8 @@ namespace libsimple
         /// </summary>
         public double[] VoxelSizeRange;
 
+        public bool potatoProcess;
+
         /// <summary>
         /// Matrix to apply transformation to MNI Space.
         /// </summary>
