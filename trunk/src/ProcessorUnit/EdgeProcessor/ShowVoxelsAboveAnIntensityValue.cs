@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace ProcessorUnit
 {
-    class ShowVoxelsAboveAnIntensityValue:IProcessor
+    class ShowVoxelsAboveAnIntensityValue : IProcessor
     {
         private string[,] arguments;
-        private int percentage;
+        private int percentage_from;
+        private int percentage_to;
 
         /// <summary>
         /// Returns canonical name for the Processor.
@@ -41,9 +42,10 @@ namespace ProcessorUnit
         string[,] IProcessor.GetArgs()
         {
 
-            arguments = new string[1, 2];
+            arguments = new string[2, 2];
             arguments[0, 0] = "Enter an intensity percentage (%): ";
-            arguments[0, 1] = "All the voxels which are under the specified intensity percentage will be hidden.";
+            arguments[1, 0] = "Enter an intensity percentage (%): ";
+            //arguments[2, 1] = "All the voxels which are under the specified intensity percentage will be hidden.";
             return arguments;
         }
 
@@ -58,7 +60,8 @@ namespace ProcessorUnit
             if (args.GetLength(0) != 0)
             {
 
-                percentage = Convert.ToInt32( args[0]);
+                percentage_from = Convert.ToInt32(args[0]);
+                percentage_to = Convert.ToInt32(args[1]);
             }
         }
 
@@ -84,7 +87,7 @@ namespace ProcessorUnit
                 for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
                 {
 
-                    if (p.Intensities[0, i] >= percentage)
+                    if (p.Intensities[0, i] >= percentage_from && p.Intensities[0, i] <= percentage_to)
                     {
 
                         tmp.Add(newPacket.vXYZ[i]);
@@ -106,9 +109,9 @@ namespace ProcessorUnit
                     {
                         for (int j = 0, k = 0; j < p.Edges.GetLength(1); j++)
                         {
-                            if (p.Intensities[0, j] < percentage) continue;
+                            if (p.Intensities[0, j] < percentage_from || p.Intensities[0, j] > percentage_to) continue;
                             List<KeyValuePair<int, double>> tempEdges = new List<KeyValuePair<int, double>>(p.Edges[i, j]);
-                            tempEdges.RemoveAll(x => (p.Intensities[0, x.Key] < percentage));
+                            tempEdges.RemoveAll(x => (p.Intensities[0, x.Key] < percentage_from || p.Intensities[0, x.Key] > percentage_to));
 
                             for (int l = 0; l < tempEdges.Count; l++)
                             {
@@ -127,7 +130,7 @@ namespace ProcessorUnit
 
             }
 
-        }   
-     
+        }
+
     }
 }

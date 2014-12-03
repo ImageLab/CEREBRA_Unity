@@ -47,11 +47,8 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Standard Assets\Scripts\General Scripts\ActivateTrigger.cs" />
- <Reference Include="ConvexHullProcessor">
- <HintPath>C:/Users/Can/Google Drive/Developer/Unity/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/ConvexHullProcessor.dll</HintPath>
- </Reference>
  <Reference Include="libsimple">
- <HintPath>C:/Users/Can/Google Drive/Developer/Unity/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>
+ <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
