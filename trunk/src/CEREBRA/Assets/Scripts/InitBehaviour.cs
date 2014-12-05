@@ -6,8 +6,6 @@ using System.IO;
 
 public class InitBehaviour : MonoBehaviour
 {
-    public Texture2D ScaleTexture;
-
     SimpleUI.UI CEREBRAUI;
     SimpleUI.UIList processorListElem;
     string lastLoadedData;
@@ -594,6 +592,6 @@ public class InitBehaviour : MonoBehaviour
 
         renderer = (OptimizedPacketRenderer)Camera.allCameras[0].gameObject.AddComponent(typeof(OptimizedPacketRenderer));
         renderer.packetToRender = p;
-        renderer.ScaleTexture = ScaleTexture;
+        //renderer.ScaleTexture = ScaleTexture;
     }
 }
