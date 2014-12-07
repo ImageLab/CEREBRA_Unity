@@ -8,7 +8,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     int voxelBufSize = 1800; //65536 -> max suggested vertex count in a mesh. 65536/36 =~ 1800 num of voxels in a mesh
 	public float moveSpeed = 10f;
 
-    Mesh[] meshes;
+    //Mesh[] meshes;
 	//private float speed = 1.0f;
     public libsimple.Packet packetToRender;
 
@@ -47,7 +47,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			int numVoxels=packetToRender.vXYZ.Length;
 
-            meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
+            //meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
             int meshIndex = 0;
 
 			for (int j = 0; j < numVoxels; j++, i++)
@@ -57,21 +57,21 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
                     GameObject g = new GameObject("VoxelNode_" + (j / voxelBufSize).ToString());
                     g.transform.parent = targetGameObject.transform;
-                    meshes[meshIndex] = g.AddComponent<MeshFilter>().mesh;
+                    Mesh mesh = g.AddComponent<MeshFilter>().mesh;
 
 					g.AddComponent<MeshRenderer>();
                     g.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
                     g.renderer.material.shader = targetGameObject.renderer.material.shader;
 
-                    meshes[meshIndex].Clear();
+                    mesh.Clear();
 
-                    meshes[meshIndex].vertices = vertices;
-                    meshes[meshIndex].uv = uvs;
-                    meshes[meshIndex].triangles = tris;
-                    meshes[meshIndex].RecalculateNormals();
-                    meshes[meshIndex].RecalculateBounds();
+                    mesh.vertices = vertices;
+                    mesh.uv = uvs;
+                    mesh.triangles = tris;
+                    mesh.RecalculateNormals();
+                    mesh.RecalculateBounds();
 
-                    meshes[meshIndex].Optimize();
+                    mesh.Optimize();
 
 					lenVoxels=numVoxels-j;
                     if (lenVoxels > voxelBufSize)
@@ -149,20 +149,20 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			GameObject go = new GameObject("VoxelNode_final");
 			go.transform.parent = targetGameObject.transform;
-            meshes[meshIndex] = go.AddComponent<MeshFilter>().mesh;
+            Mesh mesh2 = go.AddComponent<MeshFilter>().mesh;
 			go.AddComponent<MeshRenderer>();
             go.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
             go.renderer.material.shader = targetGameObject.renderer.material.shader;
 
-            meshes[meshIndex].Clear();
+            mesh2.Clear();
 
-            meshes[meshIndex].vertices = vertices;
-            meshes[meshIndex].uv = uvs;
-            meshes[meshIndex].triangles = tris;
-            meshes[meshIndex].RecalculateNormals();
-            meshes[meshIndex].RecalculateBounds();
+            mesh2.vertices = vertices;
+            mesh2.uv = uvs;
+            mesh2.triangles = tris;
+            mesh2.RecalculateNormals();
+            mesh2.RecalculateBounds();
 
-            meshes[meshIndex].Optimize();
+            mesh2.Optimize();
 
 			//GameObject.Find("TargetGameObject").renderer.material.SetColor(0,new Color(1, 1, 1, 0.7f));
 		}

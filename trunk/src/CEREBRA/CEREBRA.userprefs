@@ -1,8 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\IntensityShader.shader">
     <Files>
-      <File FileName="Assets\IntensityShader.shader" Line="17" Column="21" />
+      <File FileName="Assets\IntensityShader.shader" Line="18" Column="9" />
+      <File FileName="Assets\Scripts\AnimatedTextureExtendedUV.cs" Line="59" Column="2" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

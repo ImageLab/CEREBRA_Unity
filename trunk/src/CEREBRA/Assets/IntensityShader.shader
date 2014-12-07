@@ -15,7 +15,7 @@
 		};
 		
 		sampler2D _MainTex;
-		//float _MyFloat;
+		float2 _MyBackground;
 		//float _myfirst;
 		//float _mysecond;
 		
