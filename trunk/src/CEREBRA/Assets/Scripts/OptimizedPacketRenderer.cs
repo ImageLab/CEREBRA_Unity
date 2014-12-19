@@ -397,10 +397,34 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     float timeLeft = 0;
     Color targetColor = new Color(Random.value, Random.value, Random.value);
     //public float scrollSpeed = 0.5F;
-
+    private float doubleClickStart = -1.0f;
+    private bool disableClicks = false;
+    void OnDoubleClick()
+    {
+        //transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);  
+        //if(PotatoProcess==true)
+          //  o koordinattaki slice i pop up yap(Input.mousePosition.x  ve Input.mousePosition.y kullan)
+            //    potatoprocess=true
+    }
+     
 	// Update is called once per frame
 	void Update()
 	{
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (disableClicks)
+                return;
+
+            if (doubleClickStart > 0 && (Time.time - doubleClickStart) < 0.4)
+            {
+                this.OnDoubleClick();
+                doubleClickStart = -1;
+            }
+            else
+            {
+                doubleClickStart = Time.time;
+            }
+        }
 		if (Input.GetKey("w"))
 		{
 			transform.Translate(-Vector3.up * moveSpeed * Time.deltaTime);

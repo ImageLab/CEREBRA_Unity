@@ -11,6 +11,7 @@ namespace libsimple
 		/// Returns canonical name for the Processor.
 		/// </summary>
 		/// <returns>string</returns>
+        ///
 		string GetProcessorName();
 
 		/// <summary>
