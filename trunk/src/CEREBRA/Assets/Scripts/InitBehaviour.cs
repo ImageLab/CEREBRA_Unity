@@ -6,9 +6,8 @@ using System.IO;
 
 public class InitBehaviour : MonoBehaviour
 {
-    public Texture2D ScaleTexture;
-
     SimpleUI.UI CEREBRAUI;
+
     SimpleUI.UIList processorListElem;
     string lastLoadedData;
     List<string[]> processorConfigs = new List<string[]>();
@@ -16,14 +15,22 @@ public class InitBehaviour : MonoBehaviour
     SimpleUI.UISlider layerSlider;
     SimpleUI.UISlider layerSlidery;
     SimpleUI.UISlider layerSliderz;
+    SimpleUI.UIButton exitPP; //exit potato print operation without selecting any slice
+    float exit = 0; //variable for exitPP button
     libsimple.Packet lastLoadedPacket;
     libsimple.Packet packetToDisplay;
     libsimple.Packet nextPacket;
     int percent;
-    float layerValueX ;
-    float layerValueY ;
-    float layerValueZ ;
-
+    float layerValueX;
+    float layerValueY;
+    float layerValueZ;
+    string sliceAxis = "Y";
+    int whichQuadrat = 0;
+    int jumpCount = 4;
+    int index = -1;
+    float maxVal;
+    SimpleUI.UIButton forwardButton;
+    SimpleUI.UIButton backButton;
     void loadFile(string filename)
     {
         try
@@ -75,7 +82,7 @@ public class InitBehaviour : MonoBehaviour
         }
         System.IO.Directory.SetCurrentDirectory(currDir);
     }
-
+    SimpleUI.UILabel labelQuad;
     // Use this for initialization
     void Start()
     {
@@ -98,6 +105,9 @@ public class InitBehaviour : MonoBehaviour
         SimpleUI.UIButton reloadButton = new SimpleUI.UIButton("Reload");
         SimpleUI.UIButton saveButton = new SimpleUI.UIButton("Save");
         SimpleUI.UIButton mniButton = new SimpleUI.UIButton("MNI Conversion");
+        forwardButton = new SimpleUI.UIButton("Forward");
+        backButton = new SimpleUI.UIButton("Back");
+
 
         processorListElem = new SimpleUI.UIList(new Vector2(0.01f, 0.05f), new Vector2(0.18f, 0.4f));
         processorListElem.Data = new System.Collections.Generic.List<string>();
@@ -106,9 +116,9 @@ public class InitBehaviour : MonoBehaviour
 
         float scaling = 0.03f / Screen.height * Screen.width;
 
-		SimpleUI.UILabel processorListLabel = new SimpleUI.UILabel("List of Applied Processors");
-		processorListLabel.Size = new Vector2(0.2f, scaling);
-		processorListLabel.Position = new Vector2(0.85f, 0.01f);
+        SimpleUI.UILabel processorListLabel = new SimpleUI.UILabel("List of Applied Processors");
+        processorListLabel.Size = new Vector2(0.2f, scaling);
+        processorListLabel.Position = new Vector2(0.85f, 0.01f);
 
         SimpleUI.UIButton addButton = new SimpleUI.UIButton("+");
         addButton.Size = new Vector2(0.04f, scaling);
@@ -117,17 +127,17 @@ public class InitBehaviour : MonoBehaviour
 
         SimpleUI.UIButton delButton = new SimpleUI.UIButton("-");
         delButton.Size = new Vector2(0.04f, scaling);
-		delButton.Position = new Vector2(0.056f, 0.45f);
+        delButton.Position = new Vector2(0.056f, 0.45f);
         delButton.onClick += delButton_onClick;
 
         SimpleUI.UIButton upButton = new SimpleUI.UIButton("^");
         upButton.Size = new Vector2(0.04f, scaling);
-		upButton.Position = new Vector2(0.104f, 0.45f);
+        upButton.Position = new Vector2(0.104f, 0.45f);
         upButton.onClick += upButton_onClick;
 
         SimpleUI.UIButton downButton = new SimpleUI.UIButton("v");
         downButton.Size = new Vector2(0.04f, scaling);
-		downButton.Position = new Vector2(0.152f, 0.45f);
+        downButton.Position = new Vector2(0.152f, 0.45f);
         downButton.onClick += downButton_onClick;
 
         SimpleUI.UIHGroup hg = new SimpleUI.UIHGroup();
@@ -148,27 +158,27 @@ public class InitBehaviour : MonoBehaviour
         layerSlider.onChange += layerSlider_onChange;
 
         // new sliders
-		SimpleUI.UILabel sliderLabely = new SimpleUI.UILabel("Layer Depth in Y Direction");
+        SimpleUI.UILabel sliderLabely = new SimpleUI.UILabel("Layer Depth in Y Direction");
         sliderLabely.Size = new Vector2(0.15f, 0.05f);
         sliderLabely.Position = new Vector2(0.81f, 0.58f);
-        
+
         layerSlidery = new SimpleUI.UISlider();
         layerSlidery.Size = new Vector2(0.1f, 0.05f);
         layerSlidery.Position = new Vector2(0.81f, 0.61f);
         layerSlidery.onChange += layerSlidery_onChange;
 
-		SimpleUI.UILabel sliderLabelz = new SimpleUI.UILabel("Layer Depth in Z Direction");
+        SimpleUI.UILabel sliderLabelz = new SimpleUI.UILabel("Layer Depth in Z Direction");
         sliderLabelz.Size = new Vector2(0.15f, 0.05f);
         sliderLabelz.Position = new Vector2(0.81f, 0.64f);
-        
+
         layerSliderz = new SimpleUI.UISlider();
         layerSliderz.Size = new Vector2(0.1f, 0.05f);
         layerSliderz.Position = new Vector2(0.81f, 0.66f);
         layerSliderz.onChange += layerSliderz_onChange;
-        
-		loadButton.Size = new Vector2(0.05f, 0.025f);
-		loadButton.Position = new Vector2(0.815f, 0.95f);
-		loadButton.onClick += loadButton_onClick;
+
+        loadButton.Size = new Vector2(0.05f, 0.025f);
+        loadButton.Position = new Vector2(0.815f, 0.95f);
+        loadButton.onClick += loadButton_onClick;
 
         reloadButton.Size = new Vector2(0.05f, 0.025f);
         reloadButton.Position = new Vector2(0.875f, 0.95f);
@@ -179,9 +189,20 @@ public class InitBehaviour : MonoBehaviour
         mniButton.Position = new Vector2(0.9f, 0.85f);
         mniButton.onClick += mniButton_onClick;
 
+        labelQuad = new SimpleUI.UILabel((whichQuadrat * jumpCount + 1) + "-" + (whichQuadrat * jumpCount + jumpCount));
+        labelQuad.Size = new Vector2(0.2f, scaling);
+        labelQuad.Position = new Vector2(0.95f, 0.75f);
+
+        forwardButton.Size = new Vector2(0.05f, 0.025f);
+        forwardButton.Position = new Vector2(0.875f, 0.75f);
+        forwardButton.onClick += forwardButton_onClick;
+
+        backButton.Size = new Vector2(0.05f, 0.025f);
+        backButton.Position = new Vector2(0.815f, 0.75f);
+        backButton.onClick += backButton_onClick;
 
         saveButton.Size = new Vector2(0.05f, 0.025f);
-		saveButton.Position = new Vector2(0.815f, 0.85f);
+        saveButton.Position = new Vector2(0.815f, 0.85f);
         saveButton.onClick += saveButton_onClick;
 
         SimpleUI.UIButton exitButton = new SimpleUI.UIButton("Exit");
@@ -189,10 +210,15 @@ public class InitBehaviour : MonoBehaviour
         exitButton.Position = new Vector2(0.935f, 0.95f);
         exitButton.onClick += exitButton_onClick;
 
+
+
         CEREBRAUI.Add(configPanel);
-		CEREBRAUI.Add(processorListLabel);
+        CEREBRAUI.Add(processorListLabel);
+        //CEREBRAUI.Add(labelQuad);
         CEREBRAUI.Add(loadButton);
         CEREBRAUI.Add(mniButton);
+        //CEREBRAUI.Add(forwardButton);
+        //CEREBRAUI.Add(backButton);
         CEREBRAUI.Add(saveButton);
         CEREBRAUI.Add(layerSlider);
         CEREBRAUI.Add(layerSlidery);
@@ -258,13 +284,14 @@ public class InitBehaviour : MonoBehaviour
 
     void reloadButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
+        whichQuadrat = 0;
         fileBrowser_onFileSelect(null, lastLoadedData);
     }
 
     void downButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
         int selected = processorListElem.SelectedIndex;
-        
+
         if (selected < processors.Count - 1)
         {
             string strElem = processorListElem.Data[selected + 1];
@@ -283,6 +310,39 @@ public class InitBehaviour : MonoBehaviour
         }
     }
 
+    void forwardButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
+    {
+        if (whichQuadrat <= System.Math.Ceiling(maxVal/4))
+        {
+            labelQuad.Text = ((whichQuadrat * jumpCount + 1) + "-" + (whichQuadrat * jumpCount + jumpCount));
+            GameObject go = GameObject.Find("ParentGameObject");
+            GameObject goTarget = GameObject.Find("TargetGameObject");
+
+            for (int i = goTarget.transform.childCount - 1; i >= 0; i--)
+            {
+                UnityEngine.Object.DestroyImmediate(goTarget.transform.GetChild(i).gameObject);
+            }
+            renderPacket(processSlices());
+            whichQuadrat++;
+        }
+    }
+
+    void backButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
+    {
+        if (whichQuadrat != 0)
+        {
+            whichQuadrat--;
+            labelQuad.Text = ((whichQuadrat * jumpCount + 1) + "-" + (whichQuadrat * jumpCount + jumpCount));
+            GameObject go = GameObject.Find("ParentGameObject");
+            GameObject goTarget = GameObject.Find("TargetGameObject");
+
+            for (int i = goTarget.transform.childCount - 1; i >= 0; i--)
+            {
+                UnityEngine.Object.DestroyImmediate(goTarget.transform.GetChild(i).gameObject);
+            }
+            renderPacket(processSlices());
+        }
+    }
     void upButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
         int selected = processorListElem.SelectedIndex;
@@ -323,11 +383,11 @@ public class InitBehaviour : MonoBehaviour
     void mniButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
 
-        SimpleUI.UIProcessorLister lister = new SimpleUI.UIProcessorLister(new string[]  {"MNI Converter"}, new Vector2(0.5f, 0.5f));
+        SimpleUI.UIProcessorLister lister = new SimpleUI.UIProcessorLister(new string[] { "MNI Converter" }, new Vector2(0.5f, 0.5f));
         lister.onProcessorCreate += lister_onProcessorCreate;
 
         CEREBRAUI.Add(lister);
-        
+
 
 
     }
@@ -370,6 +430,7 @@ public class InitBehaviour : MonoBehaviour
 
     void loadButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
+        whichQuadrat = 0;
         SimpleUI.UIFileBrowser fileBrowser = new SimpleUI.UIFileBrowser(new Vector2(0.5f, 0.5f));
         fileBrowser.onFileSelect += fileBrowser_onFileSelect;
         CEREBRAUI.Add(fileBrowser);
@@ -377,9 +438,8 @@ public class InitBehaviour : MonoBehaviour
 
     void saveButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
-        
-    }
 
+    }
     //decide the rank vaues for each voxel.
     void registerLayers_onLoad(libsimple.Packet p)
     {
@@ -395,7 +455,7 @@ public class InitBehaviour : MonoBehaviour
         maxY = p.vXYZ[0].y;
         minZ = p.vXYZ[0].z;
         maxZ = p.vXYZ[0].z;
-        for (int i = 0; i < p.vXYZ.Length; i++) {ranks[i] = -1;ranksY[i] = -1;ranksZ[i] = -1;}
+        for (int i = 0; i < p.vXYZ.Length; i++) { ranks[i] = -1; ranksY[i] = -1; ranksZ[i] = -1; }
         for (int i = 0; i < p.vXYZ.Length; i++)
         {
             if (p.vXYZ[i].x < minX) minX = p.vXYZ[i].x;
@@ -406,8 +466,8 @@ public class InitBehaviour : MonoBehaviour
 
             if (p.vXYZ[i].z < minZ) minZ = p.vXYZ[i].z;
             if (p.vXYZ[i].z > maxZ) maxZ = p.vXYZ[i].z;
-        } 
-        
+        }
+
         avgX = (maxX + minX) / 2;
         avgY = (maxY + minY) / 2;
         avgZ = (maxZ + minZ) / 2;
@@ -447,7 +507,7 @@ public class InitBehaviour : MonoBehaviour
             return null;
         else
         {
-            
+
             int layerValX = layerSlider.maxValue - (int)layerValueX;
             int layerValY = layerSlidery.maxValue - (int)layerValueY;
             int layerValZ = layerSliderz.maxValue - (int)layerValueZ;
@@ -456,7 +516,7 @@ public class InitBehaviour : MonoBehaviour
             int[] ranksZ = (int[])lastLoadedPacket.getExtra("layerRanksZ");
 
             libsimple.Packet newPacket = lastLoadedPacket.Copy();
-            
+
             int[] keyMap = new int[newPacket.vXYZ.Length];
 
             List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
@@ -466,7 +526,7 @@ public class InitBehaviour : MonoBehaviour
 
                 if (ranks[i] <= layerValX && ranksY[i] <= layerValY && ranksZ[i] <= layerValZ)
                 {
-                   
+
                     tmp.Add(newPacket.vXYZ[i]);
                     keyMap[i] = j;
                     j++;
@@ -481,7 +541,7 @@ public class InitBehaviour : MonoBehaviour
 
             if (lastLoadedPacket.Edges != null)
             {
-                
+
                 newPacket.Edges = new KeyValuePair<int, double>[newPacket.Edges.GetLength(0), tmp.Count][];
                 for (int i = 0; i < newPacket.Edges.GetLength(0); i++)
                 {
@@ -506,7 +566,258 @@ public class InitBehaviour : MonoBehaviour
             }
             return newPacket;
         }
-      
+
+    }
+
+    libsimple.Packet processSlices()
+    {
+        if (lastLoadedPacket == null)
+            return null;
+        else
+        {
+
+            /*int layerValX = layerSlider.maxValue - (int)layerValueX;
+            int layerValY = layerSlidery.maxValue - (int)layerValueY;
+            int layerValZ = layerSliderz.maxValue - (int)layerValueZ;
+            int[] ranks = (int[])lastLoadedPacket.getExtra("layerRanks");
+            int[] ranksY = (int[])lastLoadedPacket.getExtra("layerRanksY");
+            int[] ranksZ = (int[])lastLoadedPacket.getExtra("layerRanksZ");*/
+
+            int[] ranks = new int[lastLoadedPacket.vXYZ.Length];
+            int[] ranksY = new int[lastLoadedPacket.vXYZ.Length];
+            int[] ranksZ = new int[lastLoadedPacket.vXYZ.Length];
+            float minX, maxX;
+            float minY, maxY;
+            float minZ, maxZ;
+            minX = lastLoadedPacket.vXYZ[0].x;
+            maxX = lastLoadedPacket.vXYZ[0].x;
+            minY = lastLoadedPacket.vXYZ[0].y;
+            maxY = lastLoadedPacket.vXYZ[0].y;
+            minZ = lastLoadedPacket.vXYZ[0].z;
+            maxZ = lastLoadedPacket.vXYZ[0].z;
+            for (int i = 0; i < lastLoadedPacket.vXYZ.Length; i++) { ranks[i] = -1; ranksY[i] = -1; ranksZ[i] = -1; }
+            for (int i = 0; i < lastLoadedPacket.vXYZ.Length; i++)
+            {
+                if (lastLoadedPacket.vXYZ[i].x < minX) minX = lastLoadedPacket.vXYZ[i].x;
+                if (lastLoadedPacket.vXYZ[i].x > maxX) maxX = lastLoadedPacket.vXYZ[i].x;
+
+                if (lastLoadedPacket.vXYZ[i].y < minY) minY = lastLoadedPacket.vXYZ[i].y;
+                if (lastLoadedPacket.vXYZ[i].y > maxY) maxY = lastLoadedPacket.vXYZ[i].y;
+
+                if (lastLoadedPacket.vXYZ[i].z < minZ) minZ = lastLoadedPacket.vXYZ[i].z;
+                if (lastLoadedPacket.vXYZ[i].z > maxZ) maxZ = lastLoadedPacket.vXYZ[i].z;
+            }
+
+            /*avgX = (maxX + minX) / 2;
+            avgY = (maxY + minY) / 2;
+            avgZ = (maxZ + minZ) / 2;*/
+            for (int i = 0; i < lastLoadedPacket.vXYZ.Length; i++)
+            {
+                ranks[i] = (int)(lastLoadedPacket.vXYZ[i].x - minX);
+                //--y
+                ranksY[i] = (int)(lastLoadedPacket.vXYZ[i].y - minY);
+
+                ranksZ[i] = (int)(lastLoadedPacket.vXYZ[i].z - minZ);
+            }
+
+
+            libsimple.Packet newPacket = lastLoadedPacket.Copy();
+            if (sliceAxis.Equals("X"))
+            {
+                int tempval = -1;
+                for(int k=0;k<ranks.Length;k++)
+                {
+                    if (tempval < ranks[k])
+                        tempval = ranks[k];
+                }
+                maxVal = tempval;
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+                List<int> xCoord = new List<int>();
+                List<int> yCoord = new List<int>();
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+                    for (int num = whichQuadrat * jumpCount + 1; num <= whichQuadrat * jumpCount + jumpCount; num++)
+                    {
+                        if (ranks[i] == num)
+                        {
+
+                            //newPacket.vXYZ[i].x += (float)10.0;
+                            if (num == whichQuadrat * 4 + 1)
+                            {
+                                xCoord.Add(-15);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 2)
+                            {
+                                xCoord.Add(+15);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 3)
+                            {
+                                xCoord.Add(-15);
+                                yCoord.Add(-30);
+                            }
+                            else if (num == whichQuadrat * 4 + 4)
+                            {
+                                xCoord.Add(+15);
+                                yCoord.Add(-30);
+                            }
+                            tmp.Add(newPacket.vXYZ[i]);
+                            keyMap[i] = j;
+                            j++;
+                        }
+
+                        else
+                        {
+                            keyMap[i] = -1;
+                        }
+                    }
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o].x = xCoord[o];
+                    newPacket.vXYZ[o].y += yCoord[o];
+                    newPacket.vXYZ[o].z += 60;
+                }
+
+            }
+            else if (sliceAxis.Equals("Y"))
+            {
+
+                int tempval = -1;
+                for (int k = 0; k < ranksY.Length; k++)
+                {
+                    if (tempval < ranksY[k])
+                        tempval = ranksY[k];
+                }
+                maxVal = tempval;
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+                List<int> xCoord = new List<int>();
+                List<int> yCoord = new List<int>();
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+                    for (int num = whichQuadrat * 4 + 1; num <= whichQuadrat * 4 + 4; num++)
+                    {
+                        if (ranksY[i] == num)
+                        {
+
+                            //newPacket.vXYZ[i].x += (float)10.0;
+                            if (num == whichQuadrat * 4 + 1)
+                            {
+                                xCoord.Add(-30);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 2)
+                            {
+                                xCoord.Add(+30);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 3)
+                            {
+                                xCoord.Add(-30);
+                                yCoord.Add(-30);
+                            }
+                            else if (num == whichQuadrat * 4 + 4)
+                            {
+                                xCoord.Add(+35);
+                                yCoord.Add(-30);
+                            }
+                            tmp.Add(newPacket.vXYZ[i]);
+                            keyMap[i] = j;
+                            j++;
+                        }
+
+                        else
+                        {
+                            keyMap[i] = -1;
+                        }
+                    }
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o].x += xCoord[o];
+                    newPacket.vXYZ[o].y = yCoord[o];
+                    newPacket.vXYZ[o].z += 60;
+                }
+
+            }
+            else if (sliceAxis.Equals("Z"))
+            {
+                int tempval = -1;
+                for (int k = 0; k < ranksZ.Length; k++)
+                {
+                    if (tempval < ranksZ[k])
+                        tempval = ranksZ[k];
+                }
+                maxVal = tempval;
+                int[] keyMap = new int[newPacket.vXYZ.Length];
+
+                List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+                List<int> xCoord = new List<int>();
+                List<int> yCoord = new List<int>();
+                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                {
+                    for (int num = whichQuadrat * 4 + 1; num <= whichQuadrat * 4 + 4; num++)
+                    {
+                        if (ranksZ[i] == num)
+                        {
+
+                            //newPacket.vXYZ[i].x += (float)10.0;
+                            if (num == whichQuadrat * 4 + 1)
+                            {
+                                xCoord.Add(-30);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 2)
+                            {
+                                xCoord.Add(+30);
+                                yCoord.Add(+30);
+                            }
+                            else if (num == whichQuadrat * 4 + 3)
+                            {
+                                xCoord.Add(-30);
+                                yCoord.Add(-30);
+                            }
+                            else if (num == whichQuadrat * 4 + 4)
+                            {
+                                xCoord.Add(+30);
+                                yCoord.Add(-30);
+                            }
+                            tmp.Add(newPacket.vXYZ[i]);
+                            keyMap[i] = j;
+                            j++;
+                        }
+
+                        else
+                        {
+                            keyMap[i] = -1;
+                        }
+                    }
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o].x += xCoord[o];
+                    newPacket.vXYZ[o].y += yCoord[o];
+                    newPacket.vXYZ[o].z += 60;
+                }
+
+            }
+            return newPacket;
+
+        }
     }
 
     void fileBrowser_onFileSelect(SimpleUI.IUIElement sender, object args)
@@ -548,7 +859,21 @@ public class InitBehaviour : MonoBehaviour
             }
         }
     }
+    void firstPotato() {
+        if (whichQuadrat <= System.Math.Ceiling(maxVal / 4))
+        {
+            labelQuad.Text = ((whichQuadrat * jumpCount + 1) + "-" + (whichQuadrat * jumpCount + jumpCount));
+            GameObject go = GameObject.Find("ParentGameObject");
+            GameObject goTarget = GameObject.Find("TargetGameObject");
 
+            for (int i = goTarget.transform.childCount - 1; i >= 0; i--)
+            {
+                UnityEngine.Object.DestroyImmediate(goTarget.transform.GetChild(i).gameObject);
+            }
+            renderPacket(processSlices());
+            whichQuadrat++;
+        }
+    }
     void createProcessorAndLoadData(string filename, string opener)
     {
         GameObject go = GameObject.Find("ParentGameObject");
@@ -564,27 +889,72 @@ public class InitBehaviour : MonoBehaviour
 
         libsimple.Pipeline pp = new libsimple.Pipeline();
         pp.AddProcessor(new string[] { opener, filename });
-        int index=-1;
+        index = -1;
         for (int i = 0; i < processors.Count; i++)
         {
             List<string> proc = new List<string>();
             proc.Add(processors[i].GetProcessorName());
-            if(processors[i].GetProcessorName()=="Potato Print")
-                    index=i;
             proc.AddRange(processorConfigs[i]);
-
+            if (processors[i].GetProcessorName() == "Potato Print")
+            {
+                index = i;
+                sliceAxis = processorConfigs[i][0];
+                CEREBRAUI.Add(forwardButton);
+                CEREBRAUI.Add(backButton);
+                CEREBRAUI.Add(labelQuad);
+                //labelQuad.Text = sliceAxis;
+                //continue;
+            }
             pp.AddProcessor(proc.ToArray());
         }
-
+       
         lastLoadedPacket = pp.Run();
         registerLayers_onLoad(lastLoadedPacket);
+       
         renderPacket(processLayers(layerSlider.hSliderValue));
-        if (index != -1) { 
+        if (index == -1)
+        {
+            CEREBRAUI.Remove(forwardButton);
+            CEREBRAUI.Remove(backButton);
+            CEREBRAUI.Remove(labelQuad);
         }
-
+        else
+        {
+            firstPotato();
+        }
         System.IO.Directory.SetCurrentDirectory(currDir);
+
     }
 
+    /*void renderPacket2(libsimple.Packet p)
+    {
+        OptimizedPacketRenderer renderer;
+
+        if (Camera.allCameras[0].gameObject.GetComponent<OptimizedPacketRenderer>() != null)
+            Object.DestroyImmediate(Camera.allCameras[0].gameObject.GetComponent<OptimizedPacketRenderer>());
+
+        renderer = (OptimizedPacketRenderer)Camera.allCameras[0].gameObject.AddComponent(typeof(OptimizedPacketRenderer));
+        renderer.packetToRender = p;
+        //renderer.ScaleTexture = ScaleTexture;
+
+        while (index != -1)
+        {
+            if (exit == 1 || renderer.packetToReturn != null)
+            {
+                index = -1;
+                break;
+            }
+        }
+        if (renderer.packetToReturn != null)
+        {
+            lastLoadedPacket = renderer.packetToReturn;
+            renderPacket(lastLoadedPacket);
+        }
+        else
+        {
+            renderPacket(lastLoadedPacket);
+        }
+    }*/
     void renderPacket(libsimple.Packet p)
     {
         OptimizedPacketRenderer renderer;
@@ -594,6 +964,6 @@ public class InitBehaviour : MonoBehaviour
 
         renderer = (OptimizedPacketRenderer)Camera.allCameras[0].gameObject.AddComponent(typeof(OptimizedPacketRenderer));
         renderer.packetToRender = p;
-        renderer.ScaleTexture = ScaleTexture;
+        //renderer.ScaleTexture = ScaleTexture;
     }
 }

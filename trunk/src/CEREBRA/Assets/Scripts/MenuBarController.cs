@@ -163,7 +163,7 @@ public class MenuBarController : MonoBehaviour
 
 				OptimizedPacketRenderer renderer = (OptimizedPacketRenderer)Camera.allCameras[0].gameObject.AddComponent(typeof(OptimizedPacketRenderer));
 				renderer.packetToRender = pckt;
-				renderer.ScaleTexture = ScaleTexture;
+				//renderer.ScaleTexture = ScaleTexture;
 			}
 			System.IO.Directory.SetCurrentDirectory(currDir);
 		}

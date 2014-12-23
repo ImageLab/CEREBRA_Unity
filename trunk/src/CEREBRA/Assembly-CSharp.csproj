@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\GUI Components\SkinTest.cs" />
+     <Compile Include="Assets\Scripts\AnimatedTextureExtendedUV.cs" />
      <Compile Include="Assets\Scripts\CSVLoader.cs" />
      <Compile Include="Assets\Scripts\FileBrowser.cs" />
      <Compile Include="Assets\Scripts\FilterBrowser.cs" />
@@ -80,6 +81,7 @@
      <Compile Include="Assets\SimpleUI\UISlider.cs" />
      <Compile Include="Assets\SimpleUI\UITextbox.cs" />
      <Compile Include="Assets\SimpleUI\UIWindow.cs" />
+     <None Include="Assets\IntensityShader.shader" />
  <Reference Include="libsimple">
  <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>
  </Reference>

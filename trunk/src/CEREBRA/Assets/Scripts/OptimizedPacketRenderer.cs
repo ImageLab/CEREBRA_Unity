@@ -7,8 +7,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 	float smooth = 5;
     int voxelBufSize = 1800; //65536 -> max suggested vertex count in a mesh. 65536/36 =~ 1800 num of voxels in a mesh
 	public float moveSpeed = 10f;
-	public Texture ScaleTexture;
-    Mesh[] meshes;
+
+    //Mesh[] meshes;
 	//private float speed = 1.0f;
     public libsimple.Packet packetToRender;
 
@@ -16,6 +16,10 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     float userMin;
     float voxelMin;
     float voxelMax;
+
+    private GameObject targetGameObject = GameObject.Find("TargetGameObject");
+
+    int c = 0;
 	
 	void generateVoxelGeometry(float size=1f, bool resizeByIntensity = false) 
 	{
@@ -43,29 +47,31 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			int numVoxels=packetToRender.vXYZ.Length;
 
-            meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
+            //meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
+            int meshIndex = 0;
 
 			for (int j = 0; j < numVoxels; j++, i++)
 			{
                 if (i >= voxelBufSize)
                 {
+
                     GameObject g = new GameObject("VoxelNode_" + (j / voxelBufSize).ToString());
-					g.transform.parent = GameObject.Find("TargetGameObject").transform;
-                    meshes[(j / voxelBufSize) - 1] = g.AddComponent<MeshFilter>().mesh;
+                    g.transform.parent = targetGameObject.transform;
+                    Mesh mesh = g.AddComponent<MeshFilter>().mesh;
 
-                    Mesh me = meshes[(j / voxelBufSize) - 1];
 					g.AddComponent<MeshRenderer>();
-					g.renderer.material.mainTexture = ScaleTexture;
+                    g.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
+                    g.renderer.material.shader = targetGameObject.renderer.material.shader;
 
-					me.Clear();
+                    mesh.Clear();
 
-					me.vertices = vertices;
-					me.uv = uvs;
-					me.triangles = tris;
-					me.RecalculateNormals();
-					me.RecalculateBounds();
+                    mesh.vertices = vertices;
+                    mesh.uv = uvs;
+                    mesh.triangles = tris;
+                    mesh.RecalculateNormals();
+                    mesh.RecalculateBounds();
 
-					me.Optimize();
+                    mesh.Optimize();
 
 					lenVoxels=numVoxels-j;
                     if (lenVoxels > voxelBufSize)
@@ -82,9 +88,10 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 					tris = new int[numTris];
 
 					i = 0;
+                    meshIndex++;
 				}
                 //DENEME
-               
+
                 float temp = size * 0.5f * Mathf.Clamp01((float)packetToRender.Intensities[0, j]);
                 float newsize = userMax - ( (0.5f * (voxelMax - temp)) / (voxelMax - voxelMin) );
                 float spread = resizeByIntensity ? newsize : size * 0.5f;
@@ -141,21 +148,21 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 			}
 
 			GameObject go = new GameObject("VoxelNode_final");
-			go.transform.parent = GameObject.Find("TargetGameObject").transform;
-			Mesh m = go.AddComponent<MeshFilter>().mesh;
+			go.transform.parent = targetGameObject.transform;
+            Mesh mesh2 = go.AddComponent<MeshFilter>().mesh;
 			go.AddComponent<MeshRenderer>();
-			go.renderer.material.mainTexture = ScaleTexture;
+            go.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
+            go.renderer.material.shader = targetGameObject.renderer.material.shader;
 
-			m.Clear();
+            mesh2.Clear();
 
-            //if( !packetToRender.hideVoxels)
-			m.vertices = vertices;
-			m.uv = uvs;
-			m.triangles = tris;
-			m.RecalculateNormals();
-			m.RecalculateBounds();
+            mesh2.vertices = vertices;
+            mesh2.uv = uvs;
+            mesh2.triangles = tris;
+            mesh2.RecalculateNormals();
+            mesh2.RecalculateBounds();
 
-			m.Optimize();
+            mesh2.Optimize();
 
 			//GameObject.Find("TargetGameObject").renderer.material.SetColor(0,new Color(1, 1, 1, 0.7f));
 		}
@@ -209,7 +216,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 			Color c = g.renderer.material.color;
 			c.a = 0.5f;
 			g.renderer.material.color = c;
-			g.renderer.material.mainTexture = ScaleTexture;
+			g.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
 
 			me.Clear();
 
@@ -288,7 +295,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 				g.transform.parent = GameObject.Find("TargetGameObject").transform;
 				Mesh me = g.AddComponent<MeshFilter>().mesh;
 				g.AddComponent<MeshRenderer>();
-				g.renderer.material.mainTexture = ScaleTexture;
+				g.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
 
 				me.Clear();
 
@@ -367,7 +374,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 		go.transform.parent = GameObject.Find("TargetGameObject").transform;
 		Mesh m = go.AddComponent<MeshFilter>().mesh;
 		go.AddComponent<MeshRenderer>();
-		go.renderer.material.mainTexture = ScaleTexture;
+		go.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
 
 		m.Clear();
 
@@ -389,10 +396,35 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
     float timeLeft = 0;
     Color targetColor = new Color(Random.value, Random.value, Random.value);
-
+    //public float scrollSpeed = 0.5F;
+    private float doubleClickStart = -1.0f;
+    private bool disableClicks = false;
+    void OnDoubleClick()
+    {
+        //transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);  
+        //if(PotatoProcess==true)
+          //  o koordinattaki slice i pop up yap(Input.mousePosition.x  ve Input.mousePosition.y kullan)
+            //    potatoprocess=true
+    }
+     
 	// Update is called once per frame
 	void Update()
 	{
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (disableClicks)
+                return;
+
+            if (doubleClickStart > 0 && (Time.time - doubleClickStart) < 0.4)
+            {
+                this.OnDoubleClick();
+                doubleClickStart = -1;
+            }
+            else
+            {
+                doubleClickStart = Time.time;
+            }
+        }
 		if (Input.GetKey("w"))
 		{
 			transform.Translate(-Vector3.up * moveSpeed * Time.deltaTime);
@@ -418,11 +450,11 @@ public class OptimizedPacketRenderer : MonoBehaviour {
         if (Input.GetKeyDown("c"))
         {
             //Application.CaptureScreenshot( "screenshot");
-
-            Texture2D screenShot = new Texture2D(ScaleTexture.width, ScaleTexture.height, TextureFormat.RGB24, false);
+            
+            Texture2D screenShot = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
             //ScaleT.Render();
             //RenderTexture.active = ScaleTexture;
-            screenShot.ReadPixels(new Rect(0, 0, ScaleTexture.width, ScaleTexture.height), 0, 0);
+            screenShot.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
             //RenderTexture.active = null; // JC: added to avoid errors
             byte[] bytes = screenShot.EncodeToPNG();
             string filename = string.Format( "screenshot_{0}.png", System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"));
@@ -452,7 +484,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
             //for (int i = 0; i < m.uv.Length; i++)
               //  m.uv[i] = new Vector2(0.5f, Random.value);
 
-            camera.backgroundColor = targetColor;
+            //camera.backgroundColor = targetColor;
 
             // start a new transition
             targetColor = new Color(Random.value, Random.value, Random.value);
@@ -465,10 +497,18 @@ public class OptimizedPacketRenderer : MonoBehaviour {
             // calculate interpolated color
             //for (int i = 0; i < m.uv.Length; i++)
               //  m.uv[i] = new Vector2(0.5f, Mathf.Lerp(m.uv[i].y, Random.value, 10*Time.deltaTime / timeLeft));
-            camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime/(timeLeft*smooth));
+            //camera.backgroundColor = Color.Lerp(camera.backgroundColor, targetColor, Time.deltaTime/(timeLeft*smooth));
 
             // update the timer
             timeLeft -= Time.deltaTime/smooth;
         }
+
+        //float offset = Time.time * scrollSpeed;
+
+       // targetGameObject.renderer.material.mainTextureOffset = new Vector2(0, offset);
+
+        //float a = Random.Range(0.0f, 1.0f);
+
+        //Shader.SetGlobalFloat("_MyFloat", a);
 	}
 }
