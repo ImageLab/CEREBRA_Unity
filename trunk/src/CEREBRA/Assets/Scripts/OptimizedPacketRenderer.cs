@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class OptimizedPacketRenderer : MonoBehaviour {
+    public InitBehaviour titanic;
 	int zoom = 60;
 	float smooth = 5;
     int voxelBufSize = 1800; //65536 -> max suggested vertex count in a mesh. 65536/36 =~ 1800 num of voxels in a mesh
@@ -398,15 +399,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     Color targetColor = new Color(Random.value, Random.value, Random.value);
     //public float scrollSpeed = 0.5F;
     private float doubleClickStart = -1.0f;
-    private bool disableClicks = false;
-    void OnDoubleClick()
-    {
-        //transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);  
-        //if(PotatoProcess==true)
-          //  o koordinattaki slice i pop up yap(Input.mousePosition.x  ve Input.mousePosition.y kullan)
-            //    potatoprocess=true
-    }
-     
+    private bool disableClicks = false; 
+
 	// Update is called once per frame
 	void Update()
 	{
@@ -417,12 +411,15 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
             if (doubleClickStart > 0 && (Time.time - doubleClickStart) < 0.4)
             {
-                this.OnDoubleClick();
+                float xMouse = Input.mousePosition.x;
+                float yMouse = Input.mousePosition.y;
+                titanic.OnDoubleClick(xMouse, yMouse);
                 doubleClickStart = -1;
             }
             else
             {
                 doubleClickStart = Time.time;
+                
             }
         }
 		if (Input.GetKey("w"))

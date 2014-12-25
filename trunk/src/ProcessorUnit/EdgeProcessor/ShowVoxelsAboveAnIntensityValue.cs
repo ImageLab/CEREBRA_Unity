@@ -10,8 +10,8 @@ namespace ProcessorUnit
     class ShowVoxelsAboveAnIntensityValue : IProcessor
     {
         private string[,] arguments;
-        private int percentage_from;
-        private int percentage_to;
+        private float percentage_from;
+        private float percentage_to;
 
         /// <summary>
         /// Returns canonical name for the Processor.
@@ -60,8 +60,8 @@ namespace ProcessorUnit
             if (args.GetLength(0) != 0)
             {
 
-                percentage_from = Convert.ToInt32(args[0]);
-                percentage_to = Convert.ToInt32(args[1]);
+                percentage_from = (float)Convert.ToDouble(args[0]);
+                percentage_to = (float)Convert.ToDouble(args[1]);
             }
         }
 

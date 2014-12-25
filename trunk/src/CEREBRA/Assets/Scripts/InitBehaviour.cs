@@ -19,7 +19,7 @@ public class InitBehaviour : MonoBehaviour
     float exit = 0; //variable for exitPP button
     libsimple.Packet lastLoadedPacket;
     libsimple.Packet packetToDisplay;
-    libsimple.Packet nextPacket;
+    libsimple.Packet potatoPacket;
     int percent;
     float layerValueX;
     float layerValueY;
@@ -377,8 +377,6 @@ public class InitBehaviour : MonoBehaviour
         }
     }
 
-
-
     //promote to select MNI trans. matrix, and then apply the conversion
     void mniButton_onClick(SimpleUI.IUIElement sender, System.EventArgs e)
     {
@@ -389,7 +387,114 @@ public class InitBehaviour : MonoBehaviour
         CEREBRAUI.Add(lister);
 
 
+        
+    }
 
+    public float moveSpeed = 10f;
+    public void OnDoubleClick(float xMouse, float yMouse)
+    {
+        libsimple.Packet newPacket = potatoPacket.Copy();
+        //transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);  
+        if (index != -1)
+        {
+            GameObject go = GameObject.Find("ParentGameObject");
+            GameObject goTarget = GameObject.Find("TargetGameObject");
+
+            for (int i = goTarget.transform.childCount - 1; i >= 0; i--)
+            {
+                UnityEngine.Object.DestroyImmediate(goTarget.transform.GetChild(i).gameObject);
+            }
+            //transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
+            List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
+            if (xMouse < Screen.width / 2 && yMouse < Screen.height / 2)
+            {
+
+                for (int s = 0; s < newPacket.vXYZ.Length; s++)
+                {
+                    if (newPacket.vXYZ[s].x < 0 && newPacket.vXYZ[s].y < 0)
+                    {
+                        tmp.Add(newPacket.vXYZ[s]);
+                    }
+
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o] = tmp[o];
+                    newPacket.vXYZ[o].x += 30;
+                    newPacket.vXYZ[o].z = 0;
+                    newPacket.vXYZ[o].y += 30;
+                }
+            }
+            else if (xMouse > Screen.width / 2 && yMouse < Screen.height / 2)
+            {
+
+                for (int s = 0; s < newPacket.vXYZ.Length; s++)
+                {
+                    if (newPacket.vXYZ[s].x > 0 && newPacket.vXYZ[s].y < 0)
+                    {
+                        tmp.Add(newPacket.vXYZ[s]);
+                    }
+
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o] = tmp[o];
+                    newPacket.vXYZ[o].x -= 30;
+                    newPacket.vXYZ[o].z = 0;
+                    newPacket.vXYZ[o].y += 30;
+                }
+            }
+            else if (xMouse > Screen.width / 2 && yMouse > Screen.height / 2)
+            {
+
+                for (int s = 0; s < newPacket.vXYZ.Length; s++)
+                {
+                    if (newPacket.vXYZ[s].x > 0 && newPacket.vXYZ[s].y > 0)
+                    {
+                        tmp.Add(newPacket.vXYZ[s]);
+                    }
+
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o] = tmp[o];
+                    newPacket.vXYZ[o].x -= 30;
+                    newPacket.vXYZ[o].z = 0;
+                    newPacket.vXYZ[o].y -= 30;
+                }
+            }
+            else if (xMouse < Screen.width / 2 && yMouse > Screen.height / 2)
+            {
+
+                for (int s = 0; s < newPacket.vXYZ.Length; s++)
+                {
+                    if (newPacket.vXYZ[s].x < 0 && newPacket.vXYZ[s].y > 0)
+                    {
+                        tmp.Add(newPacket.vXYZ[s]);
+                    }
+
+                }
+
+                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++)
+                {
+                    newPacket.vXYZ[o] = tmp[o];
+                    newPacket.vXYZ[o].x += 30;
+                    newPacket.vXYZ[o].z = 0;
+                    newPacket.vXYZ[o].y -= 30;
+                }
+            }
+            renderPacket(newPacket);
+
+        }
+        //  o koordinattaki slice i pop up yap(Input.mousePosition.x  ve Input.mousePosition.y kullan)
+        //    potatoprocess=true
     }
 
 
@@ -621,7 +726,7 @@ public class InitBehaviour : MonoBehaviour
             }
 
 
-            libsimple.Packet newPacket = lastLoadedPacket.Copy();
+            potatoPacket = lastLoadedPacket.Copy();
             if (sliceAxis.Equals("X"))
             {
                 int tempval = -1;
@@ -631,12 +736,12 @@ public class InitBehaviour : MonoBehaviour
                         tempval = ranks[k];
                 }
                 maxVal = tempval;
-                int[] keyMap = new int[newPacket.vXYZ.Length];
+                int[] keyMap = new int[potatoPacket.vXYZ.Length];
 
                 List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
                 List<int> xCoord = new List<int>();
                 List<int> yCoord = new List<int>();
-                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                for (int i = 0, j = 0; i < potatoPacket.vXYZ.Length; i++)
                 {
                     for (int num = whichQuadrat * jumpCount + 1; num <= whichQuadrat * jumpCount + jumpCount; num++)
                     {
@@ -646,25 +751,25 @@ public class InitBehaviour : MonoBehaviour
                             //newPacket.vXYZ[i].x += (float)10.0;
                             if (num == whichQuadrat * 4 + 1)
                             {
-                                xCoord.Add(-15);
+                                xCoord.Add(-30);
                                 yCoord.Add(+30);
                             }
                             else if (num == whichQuadrat * 4 + 2)
                             {
-                                xCoord.Add(+15);
+                                xCoord.Add(+30);
                                 yCoord.Add(+30);
                             }
                             else if (num == whichQuadrat * 4 + 3)
                             {
-                                xCoord.Add(-15);
+                                xCoord.Add(-30);
                                 yCoord.Add(-30);
                             }
                             else if (num == whichQuadrat * 4 + 4)
                             {
-                                xCoord.Add(+15);
+                                xCoord.Add(+30);
                                 yCoord.Add(-30);
                             }
-                            tmp.Add(newPacket.vXYZ[i]);
+                            tmp.Add(potatoPacket.vXYZ[i]);
                             keyMap[i] = j;
                             j++;
                         }
@@ -676,13 +781,14 @@ public class InitBehaviour : MonoBehaviour
                     }
                 }
 
-                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
-                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                potatoPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) potatoPacket.vXYZ[o] = tmp[o];
                 for (int o = 0; o < tmp.Count; o++)
                 {
-                    newPacket.vXYZ[o].x = xCoord[o];
-                    newPacket.vXYZ[o].y += yCoord[o];
-                    newPacket.vXYZ[o].z += 60;
+                    potatoPacket.vXYZ[o].x = potatoPacket.vXYZ[o].z+xCoord[o];
+                    potatoPacket.vXYZ[o].y += yCoord[o];
+                    potatoPacket.vXYZ[o].z = 60;
+
                 }
 
             }
@@ -696,12 +802,12 @@ public class InitBehaviour : MonoBehaviour
                         tempval = ranksY[k];
                 }
                 maxVal = tempval;
-                int[] keyMap = new int[newPacket.vXYZ.Length];
+                int[] keyMap = new int[potatoPacket.vXYZ.Length];
 
                 List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
                 List<int> xCoord = new List<int>();
                 List<int> yCoord = new List<int>();
-                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                for (int i = 0, j = 0; i < potatoPacket.vXYZ.Length; i++)
                 {
                     for (int num = whichQuadrat * 4 + 1; num <= whichQuadrat * 4 + 4; num++)
                     {
@@ -726,10 +832,10 @@ public class InitBehaviour : MonoBehaviour
                             }
                             else if (num == whichQuadrat * 4 + 4)
                             {
-                                xCoord.Add(+35);
+                                xCoord.Add(+30);
                                 yCoord.Add(-30);
                             }
-                            tmp.Add(newPacket.vXYZ[i]);
+                            tmp.Add(potatoPacket.vXYZ[i]);
                             keyMap[i] = j;
                             j++;
                         }
@@ -741,13 +847,13 @@ public class InitBehaviour : MonoBehaviour
                     }
                 }
 
-                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
-                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                potatoPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) potatoPacket.vXYZ[o] = tmp[o];
                 for (int o = 0; o < tmp.Count; o++)
                 {
-                    newPacket.vXYZ[o].x += xCoord[o];
-                    newPacket.vXYZ[o].y = yCoord[o];
-                    newPacket.vXYZ[o].z += 60;
+                    potatoPacket.vXYZ[o].x += xCoord[o];
+                    potatoPacket.vXYZ[o].y = yCoord[o] + potatoPacket.vXYZ[o].z;
+                    potatoPacket.vXYZ[o].z = 60;
                 }
 
             }
@@ -760,12 +866,12 @@ public class InitBehaviour : MonoBehaviour
                         tempval = ranksZ[k];
                 }
                 maxVal = tempval;
-                int[] keyMap = new int[newPacket.vXYZ.Length];
+                int[] keyMap = new int[potatoPacket.vXYZ.Length];
 
                 List<libsimple.Packet.Point3D> tmp = new List<libsimple.Packet.Point3D>();
                 List<int> xCoord = new List<int>();
                 List<int> yCoord = new List<int>();
-                for (int i = 0, j = 0; i < newPacket.vXYZ.Length; i++)
+                for (int i = 0, j = 0; i < potatoPacket.vXYZ.Length; i++)
                 {
                     for (int num = whichQuadrat * 4 + 1; num <= whichQuadrat * 4 + 4; num++)
                     {
@@ -793,7 +899,7 @@ public class InitBehaviour : MonoBehaviour
                                 xCoord.Add(+30);
                                 yCoord.Add(-30);
                             }
-                            tmp.Add(newPacket.vXYZ[i]);
+                            tmp.Add(potatoPacket.vXYZ[i]);
                             keyMap[i] = j;
                             j++;
                         }
@@ -805,17 +911,17 @@ public class InitBehaviour : MonoBehaviour
                     }
                 }
 
-                newPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
-                for (int o = 0; o < tmp.Count; o++) newPacket.vXYZ[o] = tmp[o];
+                potatoPacket.vXYZ = new libsimple.Packet.Point3D[tmp.Count];
+                for (int o = 0; o < tmp.Count; o++) potatoPacket.vXYZ[o] = tmp[o];
                 for (int o = 0; o < tmp.Count; o++)
                 {
-                    newPacket.vXYZ[o].x += xCoord[o];
-                    newPacket.vXYZ[o].y += yCoord[o];
-                    newPacket.vXYZ[o].z += 60;
+                    potatoPacket.vXYZ[o].x += xCoord[o];
+                    potatoPacket.vXYZ[o].y += yCoord[o];
+                    potatoPacket.vXYZ[o].z = 60;
                 }
 
             }
-            return newPacket;
+            return potatoPacket;
 
         }
     }
@@ -963,6 +1069,7 @@ public class InitBehaviour : MonoBehaviour
             Object.DestroyImmediate(Camera.allCameras[0].gameObject.GetComponent<OptimizedPacketRenderer>());
 
         renderer = (OptimizedPacketRenderer)Camera.allCameras[0].gameObject.AddComponent(typeof(OptimizedPacketRenderer));
+        renderer.titanic = this;
         renderer.packetToRender = p;
         //renderer.ScaleTexture = ScaleTexture;
     }
