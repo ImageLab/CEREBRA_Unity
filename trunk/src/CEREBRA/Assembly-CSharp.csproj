@@ -81,6 +81,7 @@
      <Compile Include="Assets\SimpleUI\UISlider.cs" />
      <Compile Include="Assets\SimpleUI\UITextbox.cs" />
      <Compile Include="Assets\SimpleUI\UIWindow.cs" />
+     <Compile Include="Assets\Transparent.cs" />
      <None Include="Assets\IntensityShader.shader" />
  <Reference Include="libsimple">
  <HintPath>C:/Users/Administrator/Documents/GitHub/CEREBRA/trunk/src/CEREBRA/Assets/Scripts/libsimple.dll</HintPath>

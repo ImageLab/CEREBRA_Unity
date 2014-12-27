@@ -15,6 +15,7 @@ public class InitBehaviour : MonoBehaviour
     SimpleUI.UISlider layerSlider;
     SimpleUI.UISlider layerSlidery;
     SimpleUI.UISlider layerSliderz;
+    SimpleUI.UISlider TransparencySlider;
     SimpleUI.UIButton exitPP; //exit potato print operation without selecting any slice
     float exit = 0; //variable for exitPP button
     libsimple.Packet lastLoadedPacket;
@@ -24,6 +25,7 @@ public class InitBehaviour : MonoBehaviour
     float layerValueX;
     float layerValueY;
     float layerValueZ;
+    float transparency;
     string sliceAxis = "Y";
     int whichQuadrat = 0;
     int jumpCount = 4;
@@ -176,6 +178,17 @@ public class InitBehaviour : MonoBehaviour
         layerSliderz.Position = new Vector2(0.81f, 0.66f);
         layerSliderz.onChange += layerSliderz_onChange;
 
+        SimpleUI.UILabel sliderTransparency = new SimpleUI.UILabel("Set Tranparency");
+        sliderTransparency.Size = new Vector2(0.15f, 0.05f);
+        sliderTransparency.Position = new Vector2(0.81f, 0.69f);
+
+        TransparencySlider = new SimpleUI.UISlider();
+        TransparencySlider.Size = new Vector2(0.1f, 0.05f);
+        TransparencySlider.Position = new Vector2(0.81f, 0.72f);
+        TransparencySlider.maxValue = 100; // transparency 0-1 arasinda
+        TransparencySlider.hSliderValue = 50;
+        TransparencySlider.onChange += TransparencySlider_onChange;
+
         loadButton.Size = new Vector2(0.05f, 0.025f);
         loadButton.Position = new Vector2(0.815f, 0.95f);
         loadButton.onClick += loadButton_onClick;
@@ -194,11 +207,11 @@ public class InitBehaviour : MonoBehaviour
         labelQuad.Position = new Vector2(0.95f, 0.75f);
 
         forwardButton.Size = new Vector2(0.05f, 0.025f);
-        forwardButton.Position = new Vector2(0.875f, 0.75f);
+        forwardButton.Position = new Vector2(0.875f, 0.80f);
         forwardButton.onClick += forwardButton_onClick;
 
         backButton.Size = new Vector2(0.05f, 0.025f);
-        backButton.Position = new Vector2(0.815f, 0.75f);
+        backButton.Position = new Vector2(0.815f, 0.80f);
         backButton.onClick += backButton_onClick;
 
         saveButton.Size = new Vector2(0.05f, 0.025f);
@@ -209,6 +222,7 @@ public class InitBehaviour : MonoBehaviour
         exitButton.Size = new Vector2(0.05f, 0.025f);
         exitButton.Position = new Vector2(0.935f, 0.95f);
         exitButton.onClick += exitButton_onClick;
+
 
 
 
@@ -223,11 +237,13 @@ public class InitBehaviour : MonoBehaviour
         CEREBRAUI.Add(layerSlider);
         CEREBRAUI.Add(layerSlidery);
         CEREBRAUI.Add(layerSliderz);
+        CEREBRAUI.Add(TransparencySlider);
         CEREBRAUI.Add(reloadButton);
         CEREBRAUI.Add(sliderLabel);
         CEREBRAUI.Add(sliderLabely);
         CEREBRAUI.Add(sliderLabelz);
         CEREBRAUI.Add(exitButton);
+        CEREBRAUI.Add(sliderTransparency);
 
         GameObject go = GameObject.Find("ParentGameObject");
         SimpleUI.Manager mm = go.GetComponent<SimpleUI.Manager>();
@@ -238,7 +254,15 @@ public class InitBehaviour : MonoBehaviour
     {
         Application.Quit();
     }
-
+    void TransparencySlider_onChange(SimpleUI.IUIElement sender, System.EventArgs e)
+    {
+        transparency = TransparencySlider.hSliderValue;
+        //gameObject.SetActive(true);
+        //gameObject.renderer.material.color = Color.green;
+        GameObject.Find("brain_cover/default/default_MeshPart0").renderer.material.color = new Color(1f, 1f, 1f, (float)transparency / 100);
+        GameObject.Find("brain_cover/default/default_MeshPart1").renderer.material.color = new Color(1f, 1f, 1f, (float)transparency / 100);
+        GameObject.Find("brain_cover/default/default_MeshPart2").renderer.material.color = new Color(1f, 1f, 1f, (float)transparency / 100);
+    }
     void layerSlider_onChange(SimpleUI.IUIElement sender, System.EventArgs e)
     {
 
@@ -253,6 +277,8 @@ public class InitBehaviour : MonoBehaviour
         layerValueX = layerSlider.hSliderValue;
         renderPacket(processLayers(layerSlider.hSliderValue));
     }
+
+    
     void layerSlidery_onChange(SimpleUI.IUIElement sender, System.EventArgs e)
     {
 
@@ -976,6 +1002,14 @@ public class InitBehaviour : MonoBehaviour
             {
                 UnityEngine.Object.DestroyImmediate(goTarget.transform.GetChild(i).gameObject);
             }
+
+            GameObject brain0 = GameObject.Find("brain_cover");
+            /*for (int i = brain0.transform.childCount - 1; i >= 0; i--)
+            {
+                UnityEngine.Object.DestroyImmediate(brain0.transform.GetChild(i).gameObject);
+            }*/
+            brain0.SetActive(false);
+            
             renderPacket(processSlices());
             whichQuadrat++;
         }
