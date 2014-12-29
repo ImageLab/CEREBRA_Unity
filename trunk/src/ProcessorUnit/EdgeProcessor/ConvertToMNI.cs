@@ -103,9 +103,10 @@ namespace ProcessorUnit
                 coord[1] = newPacket.vXYZ[i].y;
                 coord[2] = newPacket.vXYZ[i].z;
                 mnicoord = matrixMultiplication(coord, matrix);
-                newPacket.vXYZ[i].x = mnicoord[0];
-                newPacket.vXYZ[i].y = mnicoord[1];
-                newPacket.vXYZ[i].z = mnicoord[2];
+                newPacket.vXYZ[i].x = mnicoord[0] / 3;
+                newPacket.vXYZ[i].y = mnicoord[1] / 3;
+                newPacket.vXYZ[i].z = mnicoord[2] / 3;
+                //newPacket.vXYZ[i].z += 100;
 
                 //newPacket.vXYZ
             }
