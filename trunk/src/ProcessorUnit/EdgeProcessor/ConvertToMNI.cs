@@ -1,7 +1,6 @@
 ﻿using libsimple;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -91,7 +90,6 @@ namespace ProcessorUnit
         /// <returns>New Packet</returns>
         Packet IProcessor.Process(Packet p)
         {
-
             Packet newPacket = p.Copy();
             
             float[,] matrix = matrixTranspose(p.MNITransitionMatrix);
@@ -99,13 +97,11 @@ namespace ProcessorUnit
             //TODO: apply transition.
             float[] mnicoord;
             float[] coord = new float[3];
-            // Console.Write("In MNI debug:");
             for (int i = 0; i < newPacket.vXYZ.Length; i++ )
             {
                 coord[0] = newPacket.vXYZ[i].x;
                 coord[1] = newPacket.vXYZ[i].y;
                 coord[2] = newPacket.vXYZ[i].z;
-                // Console.WriteLine("{0} {1} {2}",newPacket.vXYZ[i].x , newPacket.vXYZ[i].y , newPacket.vXYZ[i].z);
                 mnicoord = matrixMultiplication(coord, matrix);
                 newPacket.vXYZ[i].x = mnicoord[0];
                 newPacket.vXYZ[i].y = mnicoord[1];

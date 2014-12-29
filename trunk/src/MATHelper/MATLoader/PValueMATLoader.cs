@@ -96,11 +96,10 @@ namespace MATLoader
 			}
 
 			MATHelper.MATVar vXYZ = varlist.Find((e) => e.Name == "vXYZ" || e.Name == "XYZ");
-            MATHelper.MATVar MNIMatrix = varlist.Find((e) => e.Name == "mni_coordinates");
 			double[,] pos = vXYZ.GetData2D();
-            double[,] matrix = MNIMatrix.GetData2D();
-            Console.WriteLine("Debug : size of the matrix pval");
 
+            Console.WriteLine("Debug : size of the matrix pval");
+			//Console.WriteLine(pos.GetLength(1));
 
 			double x = 0, y = 0, z = 0;
 			if (vXYZ.Dims[0] == 3)
@@ -126,13 +125,7 @@ namespace MATLoader
 				}
 			}
 			x /= pck.vXYZ.Length; y /= pck.vXYZ.Length; z /= pck.vXYZ.Length;
-            for (int i = 0; i < 4; i++)
-            {
-                pck.MNITransitionMatrix[i, 0] = matrix[i, 0];
-                pck.MNITransitionMatrix[i, 1] = matrix[i, 1];
-                pck.MNITransitionMatrix[i, 2] = matrix[i, 2];
-                pck.MNITransitionMatrix[i, 3] = matrix[i, 3];
-            }
+
 			// free pos
 			pos = null;
 
