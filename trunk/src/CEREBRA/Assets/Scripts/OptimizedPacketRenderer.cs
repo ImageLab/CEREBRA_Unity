@@ -8,6 +8,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 	float smooth = 5;
     int voxelBufSize = 1800; //65536 -> max suggested vertex count in a mesh. 65536/36 =~ 1800 num of voxels in a mesh
 	public float moveSpeed = 10f;
+    bool isAnimated = false; //set for animation activation
 
     //Mesh[] meshes;
 	//private float speed = 1.0f;
@@ -19,12 +20,101 @@ public class OptimizedPacketRenderer : MonoBehaviour {
     float voxelMax;
 
     private GameObject targetGameObject = GameObject.Find("TargetGameObject");
+    private GameObject cubeObject = GameObject.Find("Cube");
 
     int c = 0;
-	
+
+    //call this if you want an animated voxel geometry
+    void generateAnimatedVoxelGeometry(float size = 1f, bool resizeByIntensity = false)
+    {
+        if (packetToRender != null && !packetToRender.hideVoxels)
+        {
+            int lenVoxels = packetToRender.vXYZ.Length;
+
+            int numVertices = 8;
+            int numTris = 36;
+
+            for (int j = 0; j < lenVoxels; j++)
+            {
+
+                Vector3[] vertices = new Vector3[numVertices];
+                Vector2[] uvs = new Vector2[numVertices]; // texture indexes
+                int[] tris = new int[numTris];
+
+                GameObject g = GameObject.Instantiate(cubeObject) as GameObject;
+                g.transform.parent = targetGameObject.transform;
+                Mesh mesh = g.AddComponent<MeshFilter>().mesh;
+                AnimatedTextureExtendedUV anim;
+                anim = (AnimatedTextureExtendedUV)g.AddComponent(typeof(AnimatedTextureExtendedUV));
+
+                anim.intensities = new float[10];
+
+                float temp = size * 0.5f * Mathf.Clamp01((float)packetToRender.Intensities[0, j]);
+                float newsize = userMax - ((0.5f * (voxelMax - temp)) / (voxelMax - voxelMin));
+                float spread = resizeByIntensity ? newsize : size * 0.5f;
+
+                // push vertices
+                vertices[0] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
+                vertices[1] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z + spread);
+                vertices[2] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
+                vertices[3] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y - spread, (float)packetToRender.vXYZ[j].z - spread);
+                vertices[4] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
+                vertices[5] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z + spread);
+                vertices[6] = new Vector3((float)packetToRender.vXYZ[j].x + spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
+                vertices[7] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
+
+                // push texture coordinates
+                uvs[0] = new Vector2(0.5f, Mathf.Clamp01((float)packetToRender.Intensities[0, j]));
+                uvs[1] = uvs[0];
+                uvs[2] = uvs[0];
+                uvs[3] = uvs[0];
+                uvs[4] = uvs[0];
+                uvs[5] = uvs[0];
+                uvs[6] = uvs[0];
+                uvs[7] = uvs[0];
+
+                anim.intensities[0] = uvs[0].y;
+                for (int i = 1; i < anim.intensities.Length; i++)
+                    anim.intensities[i] = Random.Range(0.0f, 1.0f);
+
+                // push triangles
+                // bottom
+                tris[0] = 3; tris[1] = 1; tris[2] = 0;
+                tris[3] = 3; tris[4] = 2; tris[5] = 1;
+                // left
+                tris[6] = 3; tris[7] = 4; tris[8] = 7;
+                tris[9] = 3; tris[10] = 0; tris[11] = 4;
+                // front
+                tris[12] = 0; tris[13] = 5; tris[14] = 4;
+                tris[15] = 0; tris[16] = 1; tris[17] = 5;
+                // back
+                tris[18] = 2; tris[19] = 7; tris[20] = 6;
+                tris[21] = 2; tris[22] = 3; tris[23] = 7;
+                // right
+                tris[24] = 1; tris[25] = 6; tris[26] = 5;
+                tris[27] = 1; tris[28] = 2; tris[29] = 6;
+                // top
+                tris[30] = 4; tris[31] = 6; tris[32] = 7;
+                tris[33] = 4; tris[34] = 5; tris[35] = 6;
+
+                mesh.Clear();
+
+                mesh.vertices = vertices;
+                mesh.uv = uvs;
+                mesh.triangles = tris;
+                mesh.RecalculateNormals();
+                mesh.RecalculateBounds();
+
+                mesh.Optimize();
+            }
+        }
+        UnityEngine.Debug.Log("optimized");
+    }
 	void generateVoxelGeometry(float size=1f, bool resizeByIntensity = false) 
 	{
-		if ( packetToRender != null)
+        if (isAnimated)
+            generateAnimatedVoxelGeometry(size, resizeByIntensity);
+		else if ( packetToRender != null)
 		{
 
             if (packetToRender.hideVoxels == true) return;

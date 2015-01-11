@@ -53,7 +53,5 @@ public class AnimatedTextureExtendedUV : MonoBehaviour
 
         //    _lastIndex = index;
         //}
-
-        
     }
 }
