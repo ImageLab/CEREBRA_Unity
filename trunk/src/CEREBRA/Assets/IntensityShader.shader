@@ -2,8 +2,9 @@
 	Properties {
 		_MainTex ("Texture Image", 2D) = "white" {}
 	}
-    
+   
     SubShader {
+    
 		Tags { "RenderType" = "Opaque" }
 		
 		CGPROGRAM
@@ -11,6 +12,7 @@
 		#pragma surface surf Lambert
 		
 		struct Input {
+		
 	  		float2 uv_MainTex;
 		};
 		

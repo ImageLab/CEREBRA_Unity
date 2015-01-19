@@ -13,6 +13,8 @@ public class AnimatedTextureExtendedUV : MonoBehaviour
     private int currentIndex = 0;
     private int nextIndex = 1;
     private float currentCoord;
+    public bool isBigData = false;
+    public int timeInterval = 0;
 
     void Start()
     {
@@ -25,19 +27,32 @@ public class AnimatedTextureExtendedUV : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if( (intensities[nextIndex] < intensities[currentIndex] && currentCoord <= intensities[nextIndex]) ||
-            (intensities[nextIndex] > intensities[currentIndex] && currentCoord >= intensities[nextIndex])) {
+        if (!isBigData)
+        {
+            if ((intensities[nextIndex] < intensities[currentIndex] && currentCoord <= intensities[nextIndex]) ||
+                (intensities[nextIndex] > intensities[currentIndex] && currentCoord >= intensities[nextIndex]))
+            {
 
-            currentCoord = intensities[nextIndex];
+                currentCoord = intensities[nextIndex];
 
-            currentIndex = nextIndex;
-            nextIndex = (currentIndex+1) % intensities.Length;
+                currentIndex = nextIndex;
+                nextIndex = (currentIndex + 1) % intensities.Length;
+            }
+
+            currentCoord += (intensities[nextIndex] - intensities[currentIndex]) / 200;
+            Vector2 offset = new Vector2(0, currentCoord - intensities[currentIndex]);
+
+            _myRenderer.material.SetTextureOffset( "_MainTex", offset);
         }
+        else {
 
-        currentCoord += (intensities[nextIndex] - intensities[currentIndex])/200;
-        Vector2 offset = new Vector2(0, currentCoord - intensities[currentIndex]);
+            currentCoord = ((float)_lastIndex) / (float)timeInterval;
+            UnityEngine.Debug.Log(currentCoord);
+            _lastIndex++;
 
-        _myRenderer.material.SetTextureOffset("_MainTex", offset);
+            Vector2 offset = new Vector2(currentCoord, 0);
+            _myRenderer.material.SetTextureOffset( "_MainTex", offset);
+        }
 
         // Calculate index
         //int index = (int)(Time.timeSinceLevelLoad * _fps) % (intensities.Length);

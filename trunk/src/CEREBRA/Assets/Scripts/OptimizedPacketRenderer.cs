@@ -24,6 +24,144 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
     int c = 0;
 
+    //trying animation with a texture showing intensity values in a time interval
+    void generateAnimatedVoxelGeometryTwo(float size = 1f, bool resizeByIntensity = false)
+    {
+		if ( packetToRender != null && !packetToRender.hideVoxels)
+		{
+			int lenVoxels = packetToRender.vXYZ.Length;
+
+            if ( lenVoxels > voxelBufSize)
+                lenVoxels = voxelBufSize;
+
+            int numVertices = 0;
+
+            if( !packetToRender.hideVoxels)
+                numVertices = lenVoxels * 8;
+
+			int numTris = lenVoxels * 36;
+
+			Vector3[] vertices = new Vector3[numVertices];
+            Vector2[] uvs = new Vector2[lenVoxels * 8]; // texture indexes
+			int[] tris = new int[numTris];
+
+			int i = 0;
+
+			int numVoxels=packetToRender.vXYZ.Length;
+
+            //meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
+            int meshIndex = 0;
+
+			for (int j = 0; j < numVoxels; j++, i++)
+			{
+                if ( i >= voxelBufSize)
+                {
+                    GameObject g = GameObject.Instantiate(cubeObject) as GameObject;
+                    g.transform.parent = targetGameObject.transform;
+                    Mesh mesh = g.AddComponent<MeshFilter>().mesh;
+                    AnimatedTextureExtendedUV anim;
+                    anim = (AnimatedTextureExtendedUV)g.AddComponent(typeof(AnimatedTextureExtendedUV));
+                    anim.isBigData = true;
+                    anim.timeInterval = 2048;
+
+					g.AddComponent<MeshRenderer>();
+
+                    mesh.Clear();
+
+                    mesh.vertices = vertices;
+                    mesh.uv = uvs;
+                    mesh.triangles = tris;
+                    mesh.RecalculateNormals();
+                    mesh.RecalculateBounds();
+
+                    mesh.Optimize();
+
+					lenVoxels=numVoxels-j;
+                    if (lenVoxels > voxelBufSize)
+                        lenVoxels = voxelBufSize;
+
+                    if (packetToRender.hideVoxels)
+                        numVertices = 0;
+                    else
+					    numVertices = lenVoxels * 8;
+					numTris = lenVoxels * 36;
+
+					vertices = new Vector3[numVertices];
+                    uvs = new Vector2[lenVoxels * 8]; // texture indexes
+					tris = new int[numTris];
+
+					i = 0;
+                    meshIndex++;
+				}
+
+                float temp = size * 0.5f * Mathf.Clamp01( ( float)packetToRender.Intensities[0, j]);
+                float newsize = userMax - ( ( 0.5f * ( voxelMax - temp)) / ( voxelMax - voxelMin));
+                float spread = resizeByIntensity ? newsize : size * 0.5f;
+
+				// push vertices
+                if (!packetToRender.hideVoxels){
+
+                    vertices[i * 8 + 0] = new Vector3( ( float)packetToRender.vXYZ[j].x - spread, ( float)packetToRender.vXYZ[j].y - spread, ( float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 1] = new Vector3( ( float)packetToRender.vXYZ[j].x + spread, ( float)packetToRender.vXYZ[j].y - spread, ( float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 2] = new Vector3( ( float)packetToRender.vXYZ[j].x + spread, ( float)packetToRender.vXYZ[j].y - spread, ( float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 3] = new Vector3( ( float)packetToRender.vXYZ[j].x - spread, ( float)packetToRender.vXYZ[j].y - spread, ( float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 4] = new Vector3( ( float)packetToRender.vXYZ[j].x - spread, ( float)packetToRender.vXYZ[j].y + spread, ( float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 5] = new Vector3( ( float)packetToRender.vXYZ[j].x + spread, ( float)packetToRender.vXYZ[j].y + spread, ( float)packetToRender.vXYZ[j].z + spread);
+                    vertices[i * 8 + 6] = new Vector3( ( float)packetToRender.vXYZ[j].x + spread, ( float)packetToRender.vXYZ[j].y + spread, ( float)packetToRender.vXYZ[j].z - spread);
+                    vertices[i * 8 + 7] = new Vector3( ( float)packetToRender.vXYZ[j].x - spread, ( float)packetToRender.vXYZ[j].y + spread, ( float)packetToRender.vXYZ[j].z - spread);
+                }
+
+				// push texture coordinates
+				uvs[i * 8 + 0] = new Vector2(0, Mathf.Clamp01((float)i/2048));
+				uvs[i * 8 + 1] = uvs[i * 8 + 0];
+				uvs[i * 8 + 2] = uvs[i * 8 + 0];
+				uvs[i * 8 + 3] = uvs[i * 8 + 0];
+				uvs[i * 8 + 4] = uvs[i * 8 + 0];
+				uvs[i * 8 + 5] = uvs[i * 8 + 0];
+				uvs[i * 8 + 6] = uvs[i * 8 + 0];
+				uvs[i * 8 + 7] = uvs[i * 8 + 0];
+
+				// push triangles
+				// bottom
+				tris[i * 36 + 0] = i * 8 + 3; tris[i * 36 + 1] = i * 8 + 1; tris[i * 36 + 2] = i * 8 + 0;
+				tris[i * 36 + 3] = i * 8 + 3; tris[i * 36 + 4] = i * 8 + 2; tris[i * 36 + 5] = i * 8 + 1;
+				// left
+				tris[i * 36 + 6] = i * 8 + 3; tris[i * 36 + 7] = i * 8 + 4; tris[i * 36 + 8] = i * 8 + 7;
+				tris[i * 36 + 9] = i * 8 + 3; tris[i * 36 + 10] = i * 8 + 0; tris[i * 36 + 11] = i * 8 + 4;
+				// front
+				tris[i * 36 + 12] = i * 8 + 0; tris[i * 36 + 13] = i * 8 + 5; tris[i * 36 + 14] = i * 8 + 4;
+				tris[i * 36 + 15] = i * 8 + 0; tris[i * 36 + 16] = i * 8 + 1; tris[i * 36 + 17] = i * 8 + 5;
+				// back
+				tris[i * 36 + 18] = i * 8 + 2; tris[i * 36 + 19] = i * 8 + 7; tris[i * 36 + 20] = i * 8 + 6;
+				tris[i * 36 + 21] = i * 8 + 2; tris[i * 36 + 22] = i * 8 + 3; tris[i * 36 + 23] = i * 8 + 7;
+				// right
+				tris[i * 36 + 24] = i * 8 + 1; tris[i * 36 + 25] = i * 8 + 6; tris[i * 36 + 26] = i * 8 + 5;
+				tris[i * 36 + 27] = i * 8 + 1; tris[i * 36 + 28] = i * 8 + 2; tris[i * 36 + 29] = i * 8 + 6;
+				// top
+				tris[i * 36 + 30] = i * 8 + 4; tris[i * 36 + 31] = i * 8 + 6; tris[i * 36 + 32] = i * 8 + 7;
+				tris[i * 36 + 33] = i * 8 + 4; tris[i * 36 + 34] = i * 8 + 5; tris[i * 36 + 35] = i * 8 + 6;
+			}
+
+			GameObject go = new GameObject("VoxelNode_final");
+			go.transform.parent = targetGameObject.transform;
+            Mesh mesh2 = go.AddComponent<MeshFilter>().mesh;
+			go.AddComponent<MeshRenderer>();
+            go.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
+            go.renderer.material.shader = targetGameObject.renderer.material.shader;
+
+            mesh2.Clear();
+
+            mesh2.vertices = vertices;
+            mesh2.uv = uvs;
+            mesh2.triangles = tris;
+            mesh2.RecalculateNormals();
+            mesh2.RecalculateBounds();
+
+            mesh2.Optimize();
+
+            UnityEngine.Debug.Log("Optimized");
+		}
+    }
     //call this if you want an animated voxel geometry
     void generateAnimatedVoxelGeometry(float size = 1f, bool resizeByIntensity = false)
     {
@@ -41,13 +179,18 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 Vector2[] uvs = new Vector2[numVertices]; // texture indexes
                 int[] tris = new int[numTris];
 
-                GameObject g = GameObject.Instantiate(cubeObject) as GameObject;
+                GameObject g = GameObject.Instantiate( cubeObject) as GameObject;
                 g.transform.parent = targetGameObject.transform;
                 Mesh mesh = g.AddComponent<MeshFilter>().mesh;
                 AnimatedTextureExtendedUV anim;
-                anim = (AnimatedTextureExtendedUV)g.AddComponent(typeof(AnimatedTextureExtendedUV));
+                anim = ( AnimatedTextureExtendedUV)g.AddComponent( typeof( AnimatedTextureExtendedUV));
 
                 anim.intensities = new float[10];
+
+                //creating random intensity values (bw 0,1) for different time intervals
+                anim.intensities[0] = uvs[0].y;
+                for (int i = 1; i < anim.intensities.Length; i++)
+                    anim.intensities[i] = Random.Range(0.0f, 1.0f);
 
                 float temp = size * 0.5f * Mathf.Clamp01((float)packetToRender.Intensities[0, j]);
                 float newsize = userMax - ((0.5f * (voxelMax - temp)) / (voxelMax - voxelMin));
@@ -64,7 +207,7 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 vertices[7] = new Vector3((float)packetToRender.vXYZ[j].x - spread, (float)packetToRender.vXYZ[j].y + spread, (float)packetToRender.vXYZ[j].z - spread);
 
                 // push texture coordinates
-                uvs[0] = new Vector2(0.5f, Mathf.Clamp01((float)packetToRender.Intensities[0, j]));
+                uvs[0] = new Vector2(0.0f, Mathf.Clamp01((float)packetToRender.Intensities[0, j]));
                 uvs[1] = uvs[0];
                 uvs[2] = uvs[0];
                 uvs[3] = uvs[0];
@@ -72,10 +215,6 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 uvs[5] = uvs[0];
                 uvs[6] = uvs[0];
                 uvs[7] = uvs[0];
-
-                anim.intensities[0] = uvs[0].y;
-                for (int i = 1; i < anim.intensities.Length; i++)
-                    anim.intensities[i] = Random.Range(0.0f, 1.0f);
 
                 // push triangles
                 // bottom
@@ -107,18 +246,16 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
                 mesh.Optimize();
             }
+
+            UnityEngine.Debug.Log("optimized");
         }
-        UnityEngine.Debug.Log("optimized");
     }
 	void generateVoxelGeometry(float size=1f, bool resizeByIntensity = false) 
 	{
         if (isAnimated)
-            generateAnimatedVoxelGeometry(size, resizeByIntensity);
-		else if ( packetToRender != null)
+            generateAnimatedVoxelGeometryTwo(size, resizeByIntensity);
+		else if ( packetToRender != null && !packetToRender.hideVoxels)
 		{
-
-            if (packetToRender.hideVoxels == true) return;
-
 			int lenVoxels=packetToRender.vXYZ.Length;
 
             if (lenVoxels > voxelBufSize)
@@ -255,9 +392,8 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
             mesh2.Optimize();
 
-			//GameObject.Find("TargetGameObject").renderer.material.SetColor(0,new Color(1, 1, 1, 0.7f));
+            UnityEngine.Debug.Log("Optimized");
 		}
-        UnityEngine.Debug.Log("optimized");
 	}
 
 	void generateConvexHullGeometry()
