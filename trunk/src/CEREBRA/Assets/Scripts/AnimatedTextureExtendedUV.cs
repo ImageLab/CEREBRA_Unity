@@ -47,7 +47,7 @@ public class AnimatedTextureExtendedUV : MonoBehaviour
         else {
 
             currentCoord = ((float)_lastIndex) / (float)timeInterval;
-            UnityEngine.Debug.Log(currentCoord);
+            //UnityEngine.Debug.Log(currentCoord);
             _lastIndex++;
 
             Vector2 offset = new Vector2(currentCoord, 0);
