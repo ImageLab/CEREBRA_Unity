@@ -50,6 +50,9 @@ public class AnimatedTextureExtendedUV : MonoBehaviour
             //UnityEngine.Debug.Log(currentCoord);
             _lastIndex++;
 
+            if (_lastIndex > timeInterval)
+                _lastIndex = 0;
+
             Vector2 offset = new Vector2(currentCoord, 0);
             _myRenderer.material.SetTextureOffset( "_MainTex", offset);
         }

@@ -49,7 +49,6 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 
 			int numVoxels=packetToRender.vXYZ.Length;
 
-            //meshes = new Mesh[(numVoxels % voxelBufSize == 0) ? numVoxels / voxelBufSize : (int)(numVoxels / voxelBufSize) + 1];
             int meshIndex = 0;
 
 			for (int j = 0; j < numVoxels; j++, i++)
@@ -112,7 +111,11 @@ public class OptimizedPacketRenderer : MonoBehaviour {
                 }
 
 				// push texture coordinates
-				uvs[i * 8 + 0] = new Vector2(0, Mathf.Clamp01((float)i/2048));
+
+                float yCoordinate = (float)i/1800;
+                //UnityEngine.Debug.Log(yCoordinate);
+                //UnityEngine.Debug.Log(Mathf.Clamp01(yCoordinate));
+				uvs[i * 8 + 0] = new Vector2(0, Mathf.Clamp01(yCoordinate));
 				uvs[i * 8 + 1] = uvs[i * 8 + 0];
 				uvs[i * 8 + 2] = uvs[i * 8 + 0];
 				uvs[i * 8 + 3] = uvs[i * 8 + 0];
@@ -142,12 +145,13 @@ public class OptimizedPacketRenderer : MonoBehaviour {
 				tris[i * 36 + 33] = i * 8 + 4; tris[i * 36 + 34] = i * 8 + 5; tris[i * 36 + 35] = i * 8 + 6;
 			}
 
-			GameObject go = new GameObject("VoxelNode_final");
+            GameObject go = GameObject.Instantiate(cubeObject) as GameObject;
 			go.transform.parent = targetGameObject.transform;
             Mesh mesh2 = go.AddComponent<MeshFilter>().mesh;
-			go.AddComponent<MeshRenderer>();
-            go.renderer.material.mainTexture = targetGameObject.renderer.material.mainTexture;
-            go.renderer.material.shader = targetGameObject.renderer.material.shader;
+            AnimatedTextureExtendedUV anim2;
+            anim2 = (AnimatedTextureExtendedUV)go.AddComponent(typeof(AnimatedTextureExtendedUV));
+            anim2.isBigData = true;
+            anim2.timeInterval = 2048;
 
             mesh2.Clear();
 

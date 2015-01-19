@@ -141,6 +141,8 @@ MonoBehaviour:
   - .5
   - .800000012
   - .949999988
+  isBigData: 0
+  timeInterval: 0
 --- !u!1 &397406437
 GameObject:
   m_ObjectHideFlags: 0
